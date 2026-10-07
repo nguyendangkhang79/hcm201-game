@@ -3,28 +3,77 @@ import { useNavigate } from 'react-router-dom';
 import heroImage from './assets/hero-ho-chi-minh.webp';
 import './Home.css';
 
-function ArrowIcon() {
+function Icon({ name }) {
+  const paths = {
+    arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
+    user: (
+      <>
+        <circle cx="12" cy="7" r="4" />
+        <path d="M4 21a8 8 0 0 1 16 0" />
+      </>
+    ),
+    people: (
+      <>
+        <circle cx="10" cy="7" r="3" />
+        <path d="M3 21v-3a7 7 0 0 1 14 0v3M16 4a3 3 0 0 1 0 6m3 4a6 6 0 0 1 3 5v2" />
+      </>
+    ),
+    cards: (
+      <>
+        <rect x="7" y="3" width="13" height="18" rx="2" />
+        <path d="m5 5-3 1 3 15M11 7h5M11 11h5" />
+      </>
+    ),
+    search: (
+      <>
+        <circle cx="10.5" cy="10.5" r="7.5" />
+        <path d="m16 16 5 5" />
+      </>
+    ),
+    check: (
+      <>
+        <circle cx="12" cy="12" r="9" />
+        <path d="m8 12 3 3 5-6" />
+      </>
+    ),
+    close: <path d="m6 6 12 12M6 18 18 6" />,
+  };
+
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 12h14M13 6l6 6-6 6" />
+      {paths[name]}
     </svg>
   );
 }
 
-function UserIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 21a8 8 0 0 1 16 0" />
-    </svg>
-  );
-}
+const steps = [
+  { number: '01', icon: 'cards', label: 'Xếp thẻ' },
+  { number: '02', icon: 'search', label: 'Theo dõi từ khóa' },
+  { number: '03', icon: 'check', label: 'Hoàn thành Bingo' },
+];
 
 export default function Home() {
   const [playerName, setPlayerName] = useState('');
-  const [showHelp, setShowHelp] = useState(false);
-  const navigate = useNavigate();
+  const [dialog, setDialog] = useState(null);
   const dialogRef = useRef(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!dialog) return undefined;
+
+    const element = dialogRef.current;
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+
+    element.showModal();
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      element.close();
+      document.body.style.overflow = previousOverflow;
+      previousFocus?.focus();
+    };
+  }, [dialog]);
 
   const handleJoinRoom = (event) => {
     event.preventDefault();
@@ -36,69 +85,56 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    if (!showHelp) return undefined;
-
-    const closeOnEscape = (event) => {
-      if (event.key === 'Escape') {
-        setShowHelp(false);
-      }
-    };
-
-    document.addEventListener('keydown', closeOnEscape);
-    dialogRef.current?.focus();
-
-    return () => {
-      document.removeEventListener('keydown', closeOnEscape);
-    };
-  }, [showHelp]);
-
   return (
     <div className="light-home">
       <header className="home-header">
         <a
           className="home-brand"
           href="/"
-          aria-label="Bingo xã hội - Trang chủ"
+          aria-label="Bingo Hồ Chí Minh - Trang chủ"
         >
-          <span className="home-brand-mark">
-            <img src="/brand-mark.svg" alt="" />
+          <span className="home-brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 56 56">
+              <circle cx="28" cy="28" r="24" />
+              <circle cx="28" cy="28" r="20" />
+              <path d="m28 13 4.4 9 9.9 1.4-7.2 7 1.7 9.9-8.8-4.7-8.8 4.7 1.7-9.9-7.2-7 9.9-1.4Z" />
+            </svg>
           </span>
 
           <span>
-            <strong>BINGO XÃ HỘI</strong>
-            <small>SỨC MẠNH LIÊN MINH</small>
+            <strong>BINGO HỒ CHÍ MINH</strong>
+            <small>HỌC TẬP QUA TRÒ CHƠI</small>
           </span>
         </a>
 
         <nav className="home-nav" aria-label="Điều hướng chính">
-          <button type="button" onClick={() => setShowHelp(true)}>
+          <button type="button" onClick={() => setDialog('intro')}>
+            Giới thiệu
+          </button>
+          <span className="nav-divider" aria-hidden="true" />
+          <button type="button" onClick={() => setDialog('help')}>
             Cách chơi
           </button>
-          <span className="nav-divider" />
-          <span className="nav-theme">Chủ đề 4</span>
         </nav>
       </header>
 
       <main className="home-main">
-        <section className="home-copy">
-          <div className="topic-label">
-            <span />
-            TRÒ CHƠI TƯƠNG TÁC · CHỦ ĐỀ 4
-          </div>
+        <section className="home-copy" aria-labelledby="home-title">
+          <p className="topic-label">
+            <span aria-hidden="true" />
+            TRÒ CHƠI BINGO TƯƠNG TÁC
+          </p>
 
-          <h1>
-            Khám phá cơ cấu xã hội
-            <br />
-            và sức mạnh của
-            <br />
-            <em>liên minh.</em>
+          <h1 id="home-title">
+            <span>Quá trình hình thành</span>
+            <span>tư tưởng</span>
+            <em>Hồ Chí Minh</em>
           </h1>
 
           <p className="home-lead">
-            Một ván Bingo tương tác về giai cấp, tầng lớp và liên minh
-            trong thời kỳ quá độ lên chủ nghĩa xã hội ở Việt Nam. Sắp
-            xếp thẻ, lắng nghe từ khóa và kết nối đủ năm ô để chiến thắng.
+            Khám phá những dấu mốc trong quá trình hình thành tư tưởng
+            Hồ Chí Minh qua trò chơi Bingo. Kết nối từ khóa, ghi nhớ
+            kiến thức và cùng lớp chinh phục thử thách.
           </p>
 
           <form className="join-card" onSubmit={handleJoinRoom}>
@@ -106,8 +142,7 @@ export default function Home() {
 
             <div className="join-row">
               <div className="home-input-wrap">
-                <UserIcon />
-
+                <Icon name="user" />
                 <input
                   id="player-name"
                   type="text"
@@ -116,7 +151,6 @@ export default function Home() {
                   placeholder="Nhập tên của bạn"
                   maxLength={30}
                   autoComplete="name"
-                  autoFocus
                   required
                 />
               </div>
@@ -127,123 +161,127 @@ export default function Home() {
                 disabled={!playerName.trim()}
               >
                 Vào phòng chơi
-                <ArrowIcon />
+                <Icon name="arrow" />
               </button>
             </div>
 
             <p>
-              <span className="online-dot" />
-              Phòng học đang mở · Không cần tài khoản
+              <span className="online-dot" aria-hidden="true" />
+              Không cần tài khoản · Tham gia cùng lớp
             </p>
           </form>
 
           <div className="home-features" aria-label="Thông tin trò chơi">
             <div>
               <strong>25</strong>
-              <span>
-                Từ khóa
-                <br />
-                chủ đề
-              </span>
+              <span>Từ khóa</span>
             </div>
 
             <div>
               <strong>5 × 5</strong>
-              <span>
-                Bảng Bingo
-                <br />
-                tương tác
-              </span>
+              <span>Bảng Bingo</span>
             </div>
 
             <div>
-              <strong>Live</strong>
-              <span>
-                Kết nối
-                <br />
-                thời gian thực
-              </span>
+              <Icon name="people" />
+              <span>Chơi cùng lớp</span>
             </div>
           </div>
         </section>
 
-        <section
-          className="topic-visual-column"
-          aria-label="Chủ đề cơ cấu xã hội và liên minh giai cấp"
-        >
+        <figure className="topic-visual-column">
           <div className="topic-image-stage">
-            <img
-              className="topic-hero-image"
-              src={heroImage}
-              alt="Chân dung Chủ tịch Hồ Chí Minh, bản đồ Việt Nam và cờ đỏ sao vàng trên nền giấy cổ điển"
-              width={1080}
-              height={1080}
-              fetchPriority="high"
-              decoding="async"
-            />
+            <div className="topic-image-frame">
+              <img
+                className="topic-hero-image"
+                src={heroImage}
+                alt="Chân dung Chủ tịch Hồ Chí Minh, bản đồ Việt Nam và cờ đỏ sao vàng trên nền giấy cổ điển"
+                width={1080}
+                height={1080}
+                fetchPriority="high"
+                decoding="async"
+              />
+            </div>
           </div>
 
-          <div className="topic-steps" aria-label="Các bước chơi">
-            <span className="topic-step" data-step="1">
-              <strong>01</strong> SẮP XẾP THẺ
-            </span>
+          <figcaption className="topic-caption">
+            Học tập · Ghi nhớ · Kết nối
+          </figcaption>
+        </figure>
 
-            <span className="topic-step-divider" aria-hidden="true" />
-
-            <span className="topic-step" data-step="2">
-              <strong>02</strong> NGHE TỪ KHÓA
-            </span>
-
-            <span className="topic-step-divider" aria-hidden="true" />
-
-            <span className="topic-step" data-step="3">
-              <strong>03</strong> BINGO
-            </span>
-          </div>
-        </section>
+        <ol className="topic-steps" aria-label="Các bước chơi">
+          {steps.map((step) => (
+            <li className="topic-step" key={step.number}>
+              <strong>{step.number}</strong>
+              <Icon name={step.icon} />
+              <span>{step.label}</span>
+            </li>
+          ))}
+        </ol>
       </main>
 
       <footer className="home-footer">
-        <span>© 2026 Kết nối xã hội</span>
-        <span>Học tập · Kết nối · Khám phá</span>
+        <span>Bingo Hồ Chí Minh</span>
+        <span>Học tập qua trải nghiệm</span>
       </footer>
 
-      {showHelp && (
-        <div
-          className="help-overlay"
-          onMouseDown={(event) => {
+      {dialog && (
+        <dialog
+          ref={dialogRef}
+          className="help-modal"
+          aria-labelledby="help-title"
+          onCancel={() => setDialog(null)}
+          onClick={(event) => {
             if (event.target === event.currentTarget) {
-              setShowHelp(false);
+              const bounds = event.currentTarget.getBoundingClientRect();
+
+              if (
+                event.clientX < bounds.left ||
+                event.clientX > bounds.right ||
+                event.clientY < bounds.top ||
+                event.clientY > bounds.bottom
+              ) {
+                setDialog(null);
+              }
             }
           }}
         >
-          <section
-            className="help-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="help-title"
-            tabIndex="-1"
-            ref={dialogRef}
-          >
-            <div className="help-header">
-              <div>
-                <p className="topic-label">
-                  <span />
-                  HƯỚNG DẪN
-                </p>
-                <h2 id="help-title">Cách chơi Bingo</h2>
-              </div>
+          <div className="help-header">
+            <div>
+              <p className="topic-label">
+                <span aria-hidden="true" />
+                {dialog === 'intro' ? 'CHỦ ĐỀ HỌC TẬP' : 'HƯỚNG DẪN'}
+              </p>
 
-              <button
-                type="button"
-                className="modal-close"
-                onClick={() => setShowHelp(false)}
-                aria-label="Đóng hướng dẫn"
-              >
-                ×
-              </button>
+              <h2 id="help-title">
+                {dialog === 'intro' ? 'Bingo Hồ Chí Minh' : 'Cách chơi Bingo'}
+              </h2>
             </div>
 
+            <button
+              type="button"
+              className="modal-close"
+              onClick={() => setDialog(null)}
+              aria-label="Đóng hộp thoại"
+            >
+              <Icon name="close" />
+            </button>
+          </div>
+
+          {dialog === 'intro' ? (
+            <div className="intro-copy">
+              <h3>Quá trình hình thành tư tưởng Hồ Chí Minh</h3>
+              <p>
+                Khám phá chủ đề qua các từ khóa và những dấu mốc được
+                giới thiệu trong buổi học. Trò chơi giúp bạn ôn tập,
+                ghi nhớ kiến thức và tương tác cùng lớp.
+              </p>
+              <p>
+                Nhập tên để tham gia. Người điều khiển buổi học chuẩn bị
+                bộ từ khóa và công bố từng từ trong ván chơi.
+              </p>
+            </div>
+          ) : (
             <ol className="help-steps">
               <li>
                 <span>01</span>
@@ -267,9 +305,7 @@ export default function Home() {
                 <span>03</span>
                 <div>
                   <strong>Xác nhận sẵn sàng</strong>
-                  <p>
-                    Kiểm tra thẻ và chờ Trọng tài bắt đầu trò chơi.
-                  </p>
+                  <p>Kiểm tra thẻ và chờ Trọng tài bắt đầu trò chơi.</p>
                 </div>
               </li>
 
@@ -293,16 +329,17 @@ export default function Home() {
                 </div>
               </li>
             </ol>
+          )}
 
-            <button
-              type="button"
-              className="help-confirm"
-              onClick={() => setShowHelp(false)}
-            >
-              Đã hiểu, bắt đầu chơi
-            </button>
-          </section>
-        </div>
+          <button
+            type="button"
+            className="help-confirm"
+            onClick={() => setDialog(null)}
+          >
+            Đã hiểu, bắt đầu chơi
+            <Icon name="arrow" />
+          </button>
+        </dialog>
       )}
     </div>
   );
