@@ -6,54 +6,254 @@
   fill="none"
 >
   <defs>
-    <linearGradient id="fade" x2="0" y2="1">
-      <stop stop-color="#44141d" stop-opacity="0" />
-      <stop offset="1" stop-color="#220b12" stop-opacity=".8" />
+    <linearGradient
+      id="hill"
+      x1="800"
+      y1="450"
+      x2="800"
+      y2="1000"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#44141d" stop-opacity="0"/>
+      <stop offset="1" stop-color="#220b12" stop-opacity=".8"/>
     </linearGradient>
 
-    <filter id="grain">
+    <linearGradient
+      id="gold"
+      x1="30"
+      y1="110"
+      x2="135"
+      y2="240"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#f1d395"/>
+      <stop offset=".5" stop-color="#c39857"/>
+      <stop offset="1" stop-color="#916038"/>
+    </linearGradient>
+
+    <linearGradient
+      id="stem"
+      x1="-5"
+      y1="0"
+      x2="6"
+      y2="0"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#1b1014"/>
+      <stop offset=".45" stop-color="#352026"/>
+      <stop offset=".7" stop-color="#42252a"/>
+      <stop offset="1" stop-color="#211016"/>
+    </linearGradient>
+
+    <linearGradient
+      id="leafColor"
+      x1="0"
+      y1="0"
+      x2="65"
+      y2="-23"
+      gradientUnits="userSpaceOnUse"
+    >
+      <stop stop-color="#241219"/>
+      <stop offset="1" stop-color="#3e242a"/>
+    </linearGradient>
+
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
       <feTurbulence
         type="fractalNoise"
         baseFrequency=".7"
         numOctaves="3"
         stitchTiles="stitch"
       />
-      <feColorMatrix type="saturate" values="0" />
+      <feColorMatrix type="saturate" values="0"/>
       <feComponentTransfer>
-        <feFuncA type="linear" slope=".055" />
+        <feFuncA type="linear" slope=".055"/>
       </feComponentTransfer>
     </filter>
 
-    <g id="bamboo" stroke="#210b12" stroke-width="3">
-      <path d="M0 0Q-7-120 0-250M8 0Q21-140 16-220" />
-      <path d="M0-70q-43-37-65-30 15 20 60 24M0-110q45-39 67-35-18 24-63 30M0-155q-35-36-51-33 9 20 49 29M10-185q33-25 48-19-12 16-47 15" />
+    <!-- Lá tre: bản lá thuôn, đầu nhọn và gân lá mảnh. -->
+    <g id="leaf">
+      <path
+        d="M0 0C16-18 42-23 65-23 48-15 28 2 0 0Z"
+        fill="url(#leafColor)"
+      />
+      <path
+        d="M3-1Q28-12 60-22"
+        stroke="#735047"
+        stroke-opacity=".18"
+        stroke-width=".6"
+      />
+    </g>
+
+    <!-- Chùm lá mọc so le theo cành cong. -->
+    <g id="spray">
+      <path
+        d="M0 0Q35-24 86-35"
+        stroke="#2c161e"
+        stroke-width="1.5"
+        stroke-linecap="round"
+      />
+      <use
+        href="#leaf"
+        transform="translate(9 -7) rotate(-38) scale(.72)"
+      />
+      <use
+        href="#leaf"
+        transform="translate(24 -17) rotate(53) scale(.8)"
+      />
+      <use
+        href="#leaf"
+        transform="translate(38 -23) rotate(-27) scale(.86)"
+      />
+      <use
+        href="#leaf"
+        transform="translate(54 -29) rotate(61) scale(.72)"
+      />
+      <use
+        href="#leaf"
+        transform="translate(72 -33) rotate(-8) scale(.76)"
+      />
+    </g>
+
+    <!-- Thân tre hơi cong, có đốt và ánh sáng nhẹ. -->
+    <g id="culm">
+      <path
+        d="M-5 8C-3-64 0-128-3-196S-9-334-3-405L2-405C-3-334 3-263 3-196S3-64 5 8Z"
+        fill="url(#stem)"
+      />
+      <path
+        d="M-4-71Q0-73 5-71M-4-143Q0-145 4-143M-7-215Q-2-217 3-215M-7-285Q-3-287 2-285M-6-354Q-2-356 2-354"
+        stroke="#634038"
+        stroke-width="2"
+        stroke-opacity=".55"
+        stroke-linecap="round"
+      />
+      <path
+        d="M-2 0Q1-80-1-143M-2-150Q-2-185-4-210M-4-222Q-6-254-4-280M-4-294Q-4-325-2-350"
+        stroke="#735047"
+        stroke-width=".8"
+        stroke-opacity=".23"
+      />
+    </g>
+
+    <!-- Một bụi tre gồm nhiều thân và cành khác nhau. -->
+    <g id="bamboo">
+      <use href="#culm" transform="rotate(-3)"/>
+      <use
+        href="#culm"
+        transform="translate(38 18) rotate(4) scale(.76)"
+      />
+      <use
+        href="#culm"
+        transform="translate(-35 28) rotate(-8) scale(.61)"
+      />
+
+      <g stroke="#28141b" stroke-linecap="round">
+        <path
+          d="M-11-284Q17-312 47-323M-8-216Q-37-237-68-244M-4-144Q22-169 50-176M1-72Q-27-100-61-103"
+          stroke-width="2.4"
+        />
+        <path
+          d="M52-144Q70-164 99-170M46-89Q24-105 9-118M-54-121Q-80-142-100-143"
+          stroke-width="1.8"
+        />
+      </g>
+
+      <use
+        href="#spray"
+        transform="translate(17 -311) rotate(-7) scale(.86)"
+      />
+      <use
+        href="#spray"
+        transform="translate(39 -321) rotate(38) scale(.64)"
+      />
+      <use
+        href="#spray"
+        transform="translate(-34 -236) rotate(178) scale(.88)"
+      />
+      <use
+        href="#spray"
+        transform="translate(-55 -241) rotate(140) scale(.61)"
+      />
+      <use
+        href="#spray"
+        transform="translate(23 -165) rotate(13) scale(.93)"
+      />
+      <use
+        href="#spray"
+        transform="translate(-23 -95) rotate(170) scale(.82)"
+      />
+      <use
+        href="#spray"
+        transform="translate(74 -162) rotate(24) scale(.65)"
+      />
+      <use
+        href="#spray"
+        transform="translate(27 -102) rotate(155) scale(.52)"
+      />
+      <use
+        href="#spray"
+        transform="translate(-78 -136) rotate(169) scale(.55)"
+      />
     </g>
   </defs>
 
-  <path
-    d="m80 120 19 44 48 5-36 32 10 47-41-24-41 24 10-47-36-32 48-5Z"
-    fill="#d6a45d"
-    opacity=".11"
-  />
-
-  <g stroke="#a2524e" opacity=".1">
-    <path d="M-200-80 500 450M-200-40 480 470M-200 0 460 490M-200 40 440 510M-200 80 420 530M-200 120 400 550M-200 160 380 570M-200 200 360 590" />
+  <!-- Ngôi sao năm cánh cân đối với các mặt sáng tối nhẹ. -->
+  <g opacity=".14">
+    <path
+      d="M80 105 97.63 159.27 154.69 159.27 108.53 192.81 126.16 247.08 80 213.54 33.84 247.08 51.47 192.81 5.31 159.27 62.37 159.27Z"
+      fill="url(#gold)"
+    />
+    <path
+      d="M80 183.54 80 105 97.63 159.27ZM80 183.54 154.69 159.27 108.53 192.81ZM80 183.54 126.16 247.08 80 213.54Z"
+      fill="#fff0bd"
+      opacity=".22"
+    />
+    <path
+      d="M80 183.54 33.84 247.08 51.47 192.81ZM80 183.54 5.31 159.27 62.37 159.27Z"
+      fill="#573023"
+      opacity=".16"
+    />
   </g>
 
+  <!-- Các đường trang trí mờ ở góc trái. -->
+  <g stroke="#a2524e" opacity=".07">
+    <path
+      d="M-200-80 500 450M-200-40 480 470M-200 0 460 490M-200 40 440 510M-200 80 420 530M-200 120 400 550M-200 160 380 570M-200 200 360 590"
+    />
+  </g>
+
+  <!-- Lớp núi phía xa. -->
   <path
     d="m0 600 90-62 82 21 77-88 90 84 100-27 96 68 103-92 110 80 120-29 116 44 110-145 90-55 86 67 90-39 91 84 54-29v523H0Z"
-    fill="url(#fade)"
+    fill="url(#hill)"
   />
 
-  <g stroke="#9c554c" stroke-width="1" opacity=".14">
-    <path d="m0 645 90-62 82 21 77-88 90 84M1170 479l75-37 86 67 90-39 91 84 88-29M1125 608l110-82 90 99 94-33 102 93 79-9M0 710l112-37 110 60 105-10M0 760l110-28 117 62 90-12M1210 710l103-41 107 90 180-19" />
+  <g stroke="#9c554c" stroke-width="1" opacity=".11">
+    <path
+      d="m0 645 90-62 82 21 77-88 90 84M1170 479l75-37 86 67 90-39 91 84 88-29M1125 608l110-82 90 99 94-33 102 93 79-9M0 710l112-37 110 60 105-10M0 760l110-28 117 62 90-12M1210 710l103-41 107 90 180-19"
+    />
   </g>
 
-  <g opacity=".65">
-    <use href="#bamboo" transform="translate(25 845) scale(1.5)" />
-    <use href="#bamboo" transform="translate(94 926) scale(1.1)" />
-    <use href="#bamboo" transform="translate(1540 852) scale(1.7)" />
-    <use href="#bamboo" transform="translate(1470 935) scale(1.2)" />
+  <!-- Hai cụm tre ở mép, khác kích thước và góc nghiêng. -->
+  <g opacity=".58">
+    <use
+      href="#bamboo"
+      transform="translate(30 970) scale(1.02 1.14)"
+    />
+    <use
+      href="#bamboo"
+      transform="translate(108 1025) rotate(5) scale(.58 .72)"
+      opacity=".72"
+    />
+    <use
+      href="#bamboo"
+      transform="translate(1550 1010) scale(-1.08 1.38)"
+    />
+    <use
+      href="#bamboo"
+      transform="translate(1465 1040) rotate(-5) scale(-.58 .78)"
+      opacity=".68"
+    />
   </g>
 
   <rect
