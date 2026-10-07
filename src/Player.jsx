@@ -15,9 +15,106 @@ import Chat from './Chat';
 import bgImage from './assets/bg-player.jpg';
 import './Player.css';
 import './GameHeader.css';
+import './PlayerAutoArrange.css';
 
 const EMPTY_BOARD = () => Array(25).fill(null);
 const EMPTY_MARKS = () => Array(25).fill(false);
+
+function getUniqueWords(words) {
+  return [
+    ...new Set(
+      words.filter(
+        (word) => typeof word === 'string' && word.trim().length > 0,
+      ),
+    ),
+  ];
+}
+
+function shuffleWords(words, random = Math.random) {
+  const shuffled = [...words];
+
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const target = Math.floor(random() * (index + 1));
+
+    [shuffled[index], shuffled[target]] = [
+      shuffled[target],
+      shuffled[index],
+    ];
+  }
+
+  return shuffled;
+}
+
+function createAutoBoard(
+  currentBoard,
+  words,
+  { status, ready },
+  random = Math.random,
+) {
+  const fail = (message) => ({
+    board: currentBoard,
+    error: message,
+  });
+
+  if (status !== 'waiting' || ready) {
+    return fail(
+      'Bảng đã khóa. Chỉ được tự xếp trước khi xác nhận sẵn sàng.',
+    );
+  }
+
+  if (!Array.isArray(currentBoard) || currentBoard.length !== 25) {
+    return fail('Bảng chưa hợp lệ. Vui lòng tải lại trang.');
+  }
+
+  const validWords = getUniqueWords(words);
+  const placedWords = currentBoard.filter(Boolean);
+
+  if (new Set(placedWords).size !== placedWords.length) {
+    return fail(
+      'Bảng đang có từ khóa trùng. Hãy gỡ các ô trùng trước khi tự xếp.',
+    );
+  }
+
+  if (placedWords.some((word) => !validWords.includes(word))) {
+    return fail(
+      'Bộ từ khóa đã thay đổi. Hãy gỡ từ không còn trong bộ từ khóa rồi thử lại.',
+    );
+  }
+
+  if (placedWords.length === 25) {
+    return {
+      board: shuffleWords(currentBoard, random),
+      mode: 'shuffle',
+    };
+  }
+
+  const used = new Set(placedWords);
+  const candidates = validWords.filter((word) => !used.has(word));
+  const emptyCount = 25 - placedWords.length;
+
+  if (candidates.length < emptyCount) {
+    return fail(
+      `Cần ${emptyCount} từ để điền ô trống, nhưng chỉ còn ${candidates.length} từ khác nhau. Hãy nhờ Trọng tài bổ sung từ khóa.`,
+    );
+  }
+
+  const selected = shuffleWords(candidates, random).slice(
+    0,
+    emptyCount,
+  );
+
+  let cursor = 0;
+
+  const nextBoard = currentBoard.map(
+    (word) => word || selected[cursor++],
+  );
+
+  return {
+    board: nextBoard,
+    mode: 'fill',
+    filled: emptyCount,
+  };
+}
 
 const WINNING_LINES = [
   [0, 1, 2, 3, 4],
@@ -41,6 +138,14 @@ const STATUS_LABELS = {
 };
 
 function Icon({ name }) {
+  if (name === 'shuffle') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 6h3c4 0 8 12 12 12h3M17 14l4 4-4 4M3 18h3c2 0 4-3 6-6s4-6 6-6h3M17 2l4 4-4 4" />
+      </svg>
+    );
+  }
+
   if (name === 'back') {
     return (
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -93,7 +198,11 @@ export default function Player() {
   const [draggingWord, setDraggingWord] = useState(null);
   const [dragOverCell, setDragOverCell] = useState(null);
   const [wordBankOpen, setWordBankOpen] = useState(false);
+  const [wordsLoaded, setWordsLoaded] = useState(false);
+  const [gameStatusLoaded, setGameStatusLoaded] = useState(false);
+  const [setupNotice, setSetupNotice] = useState(null);
 
+  const gameStatusRef = useRef(null);
   const initialStatusChecked = useRef(false);
   const winAnnounced = useRef(false);
   const isReadyRef = useRef(false);
@@ -110,17 +219,39 @@ export default function Player() {
     : null;
 
   const filledCount = board.filter(Boolean).length;
-  const isLocked = isReady || gameStatus !== 'waiting';
+
+  const isLocked =
+    !gameStatusLoaded || isReady || gameStatus !== 'waiting';
+
+  const validBoard =
+    filledCount === 25 &&
+    new Set(board).size === 25 &&
+    board.every((word) => allWords.includes(word));
 
   const canReady =
-    filledCount === 25 &&
+    gameStatusLoaded &&
+    wordsLoaded &&
+    validBoard &&
     (gameStatus === 'waiting' || gameStatus === 'playing');
 
-  const needsLateConfirmation = gameStatus === 'playing' && !isReady;
+  const needsLateConfirmation =
+    gameStatus === 'playing' && !isReady;
 
   useEffect(() => {
     isReadyRef.current = isReady;
   }, [isReady]);
+
+  useEffect(() => {
+    if (setupNotice?.type !== 'success') {
+      return undefined;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setSetupNotice(null);
+    }, 3000);
+
+    return () => window.clearTimeout(timeout);
+  }, [setupNotice]);
 
   useEffect(() => {
     if (!playerName) {
@@ -133,7 +264,10 @@ export default function Player() {
       ref(db, 'gameState/status'),
       (snapshot) => {
         const status = snapshot.val() || 'waiting';
+
+        gameStatusRef.current = status;
         setGameStatus(status);
+        setGameStatusLoaded(true);
 
         if (!initialStatusChecked.current) {
           initialStatusChecked.current = true;
@@ -148,7 +282,10 @@ export default function Player() {
     const unsubscribeWords = onValue(
       ref(db, 'gameState/wordList'),
       (snapshot) => {
-        setAllWords(Object.values(snapshot.val() || {}));
+        setAllWords(
+          getUniqueWords(Object.values(snapshot.val() || {})),
+        );
+        setWordsLoaded(true);
       },
     );
 
@@ -160,6 +297,7 @@ export default function Player() {
         } else {
           setUnlockedWords([]);
           setMarkedCells(EMPTY_MARKS());
+          isReadyRef.current = false;
           setIsReady(false);
           setVictory(null);
           winAnnounced.current = false;
@@ -175,7 +313,9 @@ export default function Player() {
   }, []);
 
   useEffect(() => {
-    if (!playerName || gameBlocked) return undefined;
+    if (!playerName || gameBlocked) {
+      return undefined;
+    }
 
     const presenceRef = ref(
       db,
@@ -185,7 +325,9 @@ export default function Player() {
     const unsubscribeConnection = onValue(
       ref(db, '.info/connected'),
       (snapshot) => {
-        if (snapshot.val() !== true) return;
+        if (snapshot.val() !== true) {
+          return;
+        }
 
         onDisconnect(presenceRef).remove();
 
@@ -204,11 +346,14 @@ export default function Player() {
   }, [playerName, gameBlocked]);
 
   useEffect(() => {
-    if (!playerName || gameBlocked) return;
+    if (!playerName || gameBlocked) {
+      return;
+    }
 
-    update(ref(db, `gameState/players/${playerSessionId.current}`), {
-      ready: isReady,
-    });
+    update(
+      ref(db, `gameState/players/${playerSessionId.current}`),
+      { ready: isReady },
+    );
   }, [playerName, gameBlocked, isReady]);
 
   const startDrag = (event, word, sourceIndex = null) => {
@@ -217,6 +362,7 @@ export default function Player() {
       return;
     }
 
+    setSetupNotice(null);
     dragItem.current = { word, sourceIndex };
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/plain', word);
@@ -229,11 +375,65 @@ export default function Player() {
     setDragOverCell(null);
   };
 
+  const handleAutoArrange = () => {
+    if (!wordsLoaded || gameBlocked) {
+      return;
+    }
+
+    const result = createAutoBoard(board, allWords, {
+      status: gameStatusRef.current,
+      ready: isReadyRef.current,
+    });
+
+    if (result.error) {
+      setSetupNotice({
+        type: 'error',
+        message: result.error,
+      });
+      return;
+    }
+
+    finishDrag();
+    setSelectedWord(null);
+    setBoard(result.board);
+    setMarkedCells(EMPTY_MARKS());
+
+    setSetupNotice({
+      type: 'success',
+      message:
+        result.mode === 'shuffle'
+          ? 'Đã trộn vị trí. Giữ nguyên 25 từ khóa.'
+          : `Đã điền ${result.filled} ô trống. Giữ nguyên các ô bạn đã xếp.`,
+    });
+  };
+
+  const handleReady = () => {
+    const status = gameStatusRef.current;
+
+    if (
+      !canReady ||
+      gameBlocked ||
+      isReadyRef.current ||
+      (status !== 'waiting' && status !== 'playing')
+    ) {
+      return;
+    }
+
+    finishDrag();
+    setSelectedWord(null);
+    setSetupNotice(null);
+    isReadyRef.current = true;
+    setIsReady(true);
+  };
+
   const dropOnCell = (event, destinationIndex) => {
     event.preventDefault();
 
     const item = dragItem.current;
-    if (!item || placementMode !== 'drag' || isLocked) return;
+
+    if (!item || placementMode !== 'drag' || isLocked) {
+      return;
+    }
 
     setBoard((currentBoard) => {
       const nextBoard = [...currentBoard];
@@ -243,6 +443,7 @@ export default function Player() {
       }
 
       nextBoard[destinationIndex] = item.word;
+
       return nextBoard;
     });
 
@@ -253,7 +454,10 @@ export default function Player() {
     event.preventDefault();
 
     const item = dragItem.current;
-    if (!item || item.sourceIndex === null || isLocked) return;
+
+    if (!item || item.sourceIndex === null || isLocked) {
+      return;
+    }
 
     setBoard((currentBoard) => {
       const nextBoard = [...currentBoard];
@@ -275,11 +479,14 @@ export default function Player() {
 
       const rank = counter.snapshot.val();
 
-      await set(ref(db, `gameState/winners/${playerSessionId.current}`), {
-        name: playerName,
-        rank,
-        timestamp: serverTimestamp(),
-      });
+      await set(
+        ref(db, `gameState/winners/${playerSessionId.current}`),
+        {
+          name: playerName,
+          rank,
+          timestamp: serverTimestamp(),
+        },
+      );
 
       setVictory({ rank, status: 'saved' });
     } catch (error) {
@@ -294,6 +501,8 @@ export default function Player() {
       !isLocked &&
       effectiveSelectedWord
     ) {
+      setSetupNotice(null);
+
       setBoard((currentBoard) => {
         const nextBoard = [...currentBoard];
         nextBoard[index] = effectiveSelectedWord;
@@ -317,8 +526,8 @@ export default function Player() {
     nextMarks[index] = !nextMarks[index];
     setMarkedCells(nextMarks);
 
-    const hasWon = WINNING_LINES.some((line) =>
-      line.every((cell) => nextMarks[cell]),
+    const hasWon = WINNING_LINES.some(
+      (line) => line.every((cell) => nextMarks[cell]),
     );
 
     if (hasWon && !winAnnounced.current) {
@@ -329,7 +538,12 @@ export default function Player() {
 
   const removeCellWord = (event, index) => {
     event.stopPropagation();
-    if (isLocked) return;
+
+    if (isLocked) {
+      return;
+    }
+
+    setSetupNotice(null);
 
     setBoard((currentBoard) => {
       const nextBoard = [...currentBoard];
@@ -339,6 +553,12 @@ export default function Player() {
   };
 
   const changePlacementMode = (mode) => {
+    if (isLocked) {
+      return;
+    }
+
+    finishDrag();
+    setSetupNotice(null);
     setPlacementMode(mode);
     setSelectedWord(null);
 
@@ -360,7 +580,9 @@ export default function Player() {
     navigate('/', { replace: true });
   };
 
-  if (!playerName) return null;
+  if (!playerName) {
+    return null;
+  }
 
   if (gameBlocked) {
     return (
@@ -373,8 +595,8 @@ export default function Player() {
           <p className="eyebrow">PHÒNG ĐANG KHÓA</p>
           <h1>Ván chơi đã bắt đầu</h1>
           <p>
-            Bạn không thể tham gia khi trận đấu đang diễn ra. Hãy chờ
-            Trọng tài mở ván mới.
+            Bạn không thể tham gia khi trận đấu đang diễn ra.
+            Hãy chờ Trọng tài mở ván mới.
           </p>
           <button
             type="button"
@@ -429,11 +651,16 @@ export default function Player() {
                 </svg>
               </div>
 
-              <p className="result-kicker">CHÚC MỪNG CHIẾN THẮNG</p>
+              <p className="result-kicker">
+                CHÚC MỪNG CHIẾN THẮNG
+              </p>
+
               <h1>{playerName}</h1>
+
               <p>
-                Bạn đã hoàn thành một hàng Bingo gồm 5 ô liên tiếp. Một
-                kết quả xứng đáng cho sự tập trung và kết nối xuất sắc.
+                Bạn đã hoàn thành một hàng Bingo gồm 5 ô liên tiếp.
+                Một kết quả xứng đáng cho sự tập trung và kết nối
+                xuất sắc.
               </p>
             </section>
 
@@ -472,6 +699,7 @@ export default function Player() {
             <p>
               <span>★</span> HỘI NHẬP SÂU RỘNG · TỰ CHỦ VỮNG VÀNG
             </p>
+
             <button
               type="button"
               onClick={() => navigate('/', { replace: true })}
@@ -515,11 +743,8 @@ export default function Player() {
           </div>
 
           <div className="header-meta">
-            <span
-              className={`status-badge status-${gameStatus}`}
-              role="status"
-            >
-              <i aria-hidden="true" />
+            <span className={`status-badge status-${gameStatus}`}>
+              <i />
               {STATUS_LABELS[gameStatus] || STATUS_LABELS.waiting}
             </span>
 
@@ -534,17 +759,43 @@ export default function Player() {
         </header>
 
         <main className="game-layout">
-          <section className="board-panel" aria-label="Bảng Bingo">
-            <div className="section-heading">
+          <section
+            className="board-panel"
+            aria-label="Bảng Bingo"
+          >
+            <div className="section-heading board-heading">
               <div>
                 <p className="eyebrow">THẺ CỦA BẠN</p>
                 <h2>Bảng Bingo</h2>
               </div>
 
-              <span className="board-progress">
-                {filledCount}
-                <small>/25 ô</small>
-              </span>
+              <div className="board-heading-actions">
+                {!isLocked && (
+                  <button
+                    type="button"
+                    className="auto-arrange-button"
+                    onClick={handleAutoArrange}
+                    disabled={!wordsLoaded || Boolean(draggingWord)}
+                    title={
+                      filledCount === 25
+                        ? 'Trộn vị trí, giữ nguyên 25 từ khóa trên bảng'
+                        : 'Tự điền ô trống, giữ nguyên các ô đã xếp'
+                    }
+                  >
+                    <Icon name="shuffle" />
+                    {!wordsLoaded
+                      ? 'Đang tải…'
+                      : filledCount === 25
+                        ? 'Trộn vị trí'
+                        : 'Tự xếp thẻ'}
+                  </button>
+                )}
+
+                <span className="board-progress">
+                  {filledCount}
+                  <small>/25 ô</small>
+                </span>
+              </div>
             </div>
 
             {!isLocked && (
@@ -595,10 +846,23 @@ export default function Player() {
               </div>
             )}
 
+            {!isLocked && (
+              <p
+                className={`auto-arrange-notice ${
+                  setupNotice ? `notice-${setupNotice.type}` : ''
+                }`}
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                {setupNotice?.message || ''}
+              </p>
+            )}
+
             {effectiveSelectedWord && (
               <div className="selection-hint">
-                Đã chọn “{effectiveSelectedWord}” — chạm vào một ô để
-                đặt từ khóa.
+                Đã chọn “{effectiveSelectedWord}” — chạm vào một ô
+                để đặt từ khóa.
               </div>
             )}
 
@@ -657,7 +921,9 @@ export default function Player() {
                     {word ? (
                       <div
                         className={`cell-content ${
-                          draggingWord === word ? 'is-dragging' : ''
+                          draggingWord === word
+                            ? 'is-dragging'
+                            : ''
                         }`}
                         draggable={
                           !isLocked && placementMode === 'drag'
@@ -700,7 +966,9 @@ export default function Player() {
 
             <div
               className={`action-bar ${
-                filledCount === 25 && !isReady ? 'needs-ready' : ''
+                filledCount === 25 && !isReady
+                  ? 'needs-ready'
+                  : ''
               }`}
             >
               <div className="action-message">
@@ -718,10 +986,11 @@ export default function Player() {
                         ? 'Bảng đã hoàn tất'
                         : `Còn ${25 - filledCount} ô trống`}
                     </strong>
+
                     <span>
                       {filledCount === 25
                         ? 'Bấm “Xác nhận sẵn sàng” để có thể chơi khi ván bắt đầu.'
-                        : 'Kéo hoặc chọn từ khóa để lấp đầy bảng'}
+                        : 'Tự xếp thẻ, kéo thả hoặc chọn từ khóa để lấp đầy bảng'}
                     </span>
                   </>
                 )}
@@ -732,7 +1001,7 @@ export default function Player() {
                   type="button"
                   className="primary-button"
                   disabled={!canReady}
-                  onClick={() => setIsReady(true)}
+                  onClick={handleReady}
                 >
                   {gameStatus === 'playing'
                     ? 'Xác nhận và tham gia ngay'
@@ -766,6 +1035,7 @@ export default function Player() {
                   <p className="eyebrow">CHUẨN BỊ THẺ</p>
                   <h2>Kho từ khóa</h2>
                 </div>
+
                 <span className="word-count">
                   {availableWords.length}
                 </span>
@@ -780,7 +1050,11 @@ export default function Player() {
               <div
                 className="word-list"
                 onDragOver={(event) => {
-                  if (dragItem.current?.sourceIndex !== null) {
+                  if (
+                    dragItem.current &&
+                    dragItem.current.sourceIndex !== null &&
+                    !isLocked
+                  ) {
                     event.preventDefault();
                   }
                 }}
@@ -797,9 +1071,11 @@ export default function Player() {
                     onDragEnd={finishDrag}
                     className={`word-chip mode-${placementMode} ${
                       selectedWord === word ? 'is-selected' : ''
-                    } ${draggingWord === word ? 'is-dragging' : ''}`}
+                    } ${
+                      draggingWord === word ? 'is-dragging' : ''
+                    }`}
                     onClick={() => {
-                      if (placementMode === 'tap') {
+                      if (!isLocked && placementMode === 'tap') {
                         setSelectedWord((current) =>
                           current === word ? null : word,
                         );
@@ -825,7 +1101,10 @@ export default function Player() {
       </div>
 
       {needsLateConfirmation && (
-        <div className="ready-modal-backdrop" role="presentation">
+        <div
+          className="ready-modal-backdrop"
+          role="presentation"
+        >
           <section
             className="ready-modal"
             role="alertdialog"
@@ -833,21 +1112,24 @@ export default function Player() {
             aria-labelledby="ready-modal-title"
           >
             <span className="ready-modal-icon">!</span>
+
             <p className="eyebrow">VÁN CHƠI ĐÃ BẮT ĐẦU</p>
+
             <h2 id="ready-modal-title">
               Bạn chưa xác nhận sẵn sàng
             </h2>
+
             <p>
               {filledCount === 25
                 ? 'Bảng của bạn đã hoàn tất. Hãy xác nhận ngay để có thể đánh dấu các ô và tiếp tục ván chơi.'
                 : 'Bảng của bạn chưa đủ 25 từ khóa nên chưa thể tham gia ván này. Vui lòng chờ Trọng tài mở ván tiếp theo.'}
             </p>
 
-            {filledCount === 25 && (
+            {canReady && (
               <button
                 type="button"
                 className="primary-button"
-                onClick={() => setIsReady(true)}
+                onClick={handleReady}
               >
                 Xác nhận và tham gia ngay
               </button>
