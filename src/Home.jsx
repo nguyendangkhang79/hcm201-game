@@ -112,7 +112,9 @@ function Icon({ name }) {
       </>
     ),
     building: (
-      <path d="m3 9 9-6 9 6H3ZM5 10v9m5-9v9m4-9v9m5-9v9M3 21h18" />
+      <>
+        <path d="m3 9 9-6 9 6H3ZM5 10v9m5-9v9m4-9v9m5-9v9M3 21h18" />
+      </>
     ),
     close: <path d="m6 6 12 12M6 18 18 6" />,
   };
@@ -192,7 +194,9 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!dialog) return undefined;
+    if (!dialog) {
+      return undefined;
+    }
 
     const element = dialogRef.current;
     const previousFocus = document.activeElement;
@@ -232,7 +236,7 @@ export default function Home() {
         <a
           className="home-brand"
           href="/"
-          aria-label="Bingo Hồ Chí Minh - Trang chủ"
+          aria-label="Theo dấu chân Bác - Trang chủ"
         >
           <span className="home-brand-mark" aria-hidden="true">
             <svg viewBox="0 0 56 56">
@@ -243,8 +247,10 @@ export default function Home() {
           </span>
 
           <span>
-            <strong>BINGO HỒ CHÍ MINH</strong>
-            <small>HỌC TẬP QUA TRÒ CHƠI</small>
+            <strong>THEO DẤU CHÂN BÁC</strong>
+            <small>
+              KHÁM PHÁ DI TÍCH · TÌM HIỂU TƯ TƯỞNG
+            </small>
           </span>
         </a>
 
@@ -258,7 +264,10 @@ export default function Home() {
 
           <a href="#di-tich-3d">Di tích 3D</a>
 
-          <a className="home-nav-play" href="#tham-gia-bingo">
+          <a
+            className="home-nav-play"
+            href="#tham-gia-bingo"
+          >
             Chơi Bingo
             <Icon name="arrow" />
           </a>
@@ -283,9 +292,9 @@ export default function Home() {
             </h1>
 
             <p className="home-lead">
-              Theo dấu chân Người qua những địa danh lịch sử bằng
-              trải nghiệm tham quan 3D. Tìm hiểu cuộc đời, sự nghiệp
-              và cùng ôn tập chủ đề qua trò chơi Bingo.
+              Theo dấu chân Người qua những địa danh lịch sử
+              bằng trải nghiệm tham quan 3D. Tìm hiểu cuộc đời,
+              sự nghiệp và cùng ôn tập chủ đề qua trò chơi Bingo.
             </p>
 
             <div className="tour-hero-actions">
@@ -382,9 +391,9 @@ export default function Home() {
             </div>
 
             <p>
-              Khám phá những địa danh gắn với cuộc đời và sự nghiệp
-              Chủ tịch Hồ Chí Minh, để hiểu thêm bối cảnh của chủ đề
-              học tập.
+              Khám phá những địa danh gắn với cuộc đời và sự
+              nghiệp Chủ tịch Hồ Chí Minh, để hiểu thêm bối cảnh
+              của chủ đề học tập.
             </p>
           </div>
 
@@ -400,8 +409,8 @@ export default function Home() {
 
           <p className="tour-note">
             <Icon name="external" />
-            Các trải nghiệm tham quan mở trong tab mới. Quay lại
-            trang này để tiếp tục chơi Bingo.
+            Các trải nghiệm tham quan mở trong tab mới.
+            Quay lại trang này để tiếp tục chơi Bingo.
           </p>
         </section>
 
@@ -423,8 +432,9 @@ export default function Home() {
             </h2>
 
             <p>
-              Ôn lại chủ đề học tập qua bảng Bingo 5 × 5. Nhập tên
-              để vào phòng, sau đó làm theo ba bước bên dưới.
+              Ôn lại chủ đề học tập qua bảng Bingo 5 × 5.
+              Nhập tên để vào phòng, sau đó làm theo ba bước
+              bên dưới.
             </p>
 
             <div
@@ -460,8 +470,8 @@ export default function Home() {
                   <div>
                     <strong>Đánh dấu và hoàn thành Bingo</strong>
                     <p>
-                      Chọn từ đã được công bố. Đủ 5 ô ngang, dọc
-                      hoặc chéo sẽ được ghi nhận tự động.
+                      Chọn từ đã được công bố. Đủ 5 ô ngang,
+                      dọc hoặc chéo sẽ được ghi nhận tự động.
                     </p>
                   </div>
                 </li>
@@ -478,15 +488,9 @@ export default function Home() {
             </button>
           </div>
 
-          <form
-            className="join-card"
-            onSubmit={handleJoinRoom}
-          >
+          <form className="join-card" onSubmit={handleJoinRoom}>
             <div className="bingo-form-header">
-              <span
-                className="bingo-form-mark"
-                aria-hidden="true"
-              >
+              <span className="bingo-form-mark" aria-hidden="true">
                 ★
               </span>
 
@@ -494,7 +498,6 @@ export default function Home() {
                 <p className="bingo-form-kicker">
                   HỌC TẬP QUA TRÒ CHƠI
                 </p>
-
                 <h3>Tham gia phòng Bingo</h3>
               </div>
             </div>
@@ -541,10 +544,7 @@ export default function Home() {
             </p>
 
             <p>
-              <span
-                className="online-dot"
-                aria-hidden="true"
-              />
+              <span className="online-dot" aria-hidden="true" />
               Không cần tài khoản · Tham gia cùng lớp
             </p>
           </form>
@@ -552,7 +552,7 @@ export default function Home() {
       </main>
 
       <footer className="home-footer">
-        <span>Bingo Hồ Chí Minh</span>
+        <span>Theo dấu chân Bác</span>
         <span>Học tập qua trải nghiệm</span>
         <a href="#dau-trang">Về đầu trang ↑</a>
       </footer>
@@ -564,7 +564,9 @@ export default function Home() {
           aria-labelledby="help-title"
           onCancel={() => setDialog(null)}
           onClick={(event) => {
-            if (event.target !== event.currentTarget) return;
+            if (event.target !== event.currentTarget) {
+              return;
+            }
 
             const bounds =
               event.currentTarget.getBoundingClientRect();
@@ -590,7 +592,7 @@ export default function Home() {
 
               <h2 id="help-title">
                 {dialog === 'intro'
-                  ? 'Bingo Hồ Chí Minh'
+                  ? 'Theo dấu chân Bác'
                   : 'Cách chơi Bingo'}
               </h2>
             </div>
@@ -610,15 +612,16 @@ export default function Home() {
               <h3>Khám phá lịch sử, kết nối kiến thức</h3>
 
               <p>
-                Website kết hợp giới thiệu các trải nghiệm tham quan
-                di tích 3D với trò chơi Bingo về quá trình hình thành
-                tư tưởng Hồ Chí Minh.
+                Website kết hợp giới thiệu các trải nghiệm tham
+                quan di tích 3D với trò chơi Bingo về quá trình
+                hình thành tư tưởng Hồ Chí Minh.
               </p>
 
               <p>
-                Các di tích cung cấp thêm bối cảnh về cuộc đời và
-                sự nghiệp của Người. Nội dung ôn tập trong game do
-                người điều khiển buổi học chuẩn bị và công bố.
+                Các di tích cung cấp thêm bối cảnh về cuộc đời
+                và sự nghiệp của Người. Nội dung ôn tập trong
+                game do người điều khiển buổi học chuẩn bị
+                và công bố.
               </p>
             </div>
           ) : (
@@ -641,8 +644,9 @@ export default function Home() {
               </ol>
 
               <p className="help-game-note">
-                Hãy vào phòng trước khi ván bắt đầu. Sau khi xác nhận
-                sẵn sàng, bảng sẽ được khóa để chơi.
+                Hãy vào phòng trước khi ván bắt đầu.
+                Sau khi xác nhận sẵn sàng, bảng sẽ được khóa
+                để chơi.
               </p>
             </div>
           )}
