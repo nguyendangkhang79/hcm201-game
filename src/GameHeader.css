@@ -1,0 +1,141 @@
+/* Đồng bộ header /play và /live, giữ nguyên nền hiện tại. */
+
+.player-page .player-header .brand-group,
+.live-page .live-header .live-brand {
+  min-width: 0;
+}
+
+.player-page .player-header .brand-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 45px;
+  height: 45px;
+}
+
+.player-page .player-header .brand-mark img,
+.live-page .live-header .live-brand img {
+  display: block;
+  width: 45px;
+  height: 45px;
+  flex: none;
+}
+
+.player-page .player-brand-text,
+.live-page .live-brand > span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 4px;
+}
+
+.player-page .player-brand-text strong,
+.live-page .live-brand strong {
+  color: #4a1720;
+  font-family: 'Noto Serif', 'Segoe UI', Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  word-spacing: normal;
+  font-kerning: normal;
+  font-synthesis: none;
+}
+
+.player-page .player-brand-text small,
+.live-page .live-brand small {
+  margin: 0;
+  color: #8b6a36;
+  font-family: 'Segoe UI', 'Noto Sans', Arial, sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+}
+
+.player-page .player-header .player-identity {
+  min-width: 0;
+}
+
+.player-page .player-header .player-identity > span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 180px;
+  overflow: visible;
+  white-space: normal;
+}
+
+.player-page .player-header .player-identity strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.live-page .live-brand:focus-visible {
+  outline: 2px solid #843345;
+  outline-offset: 4px;
+}
+
+@media (max-width: 760px) {
+  .player-page .player-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .player-page .player-brand-text strong,
+  .live-page .live-brand strong {
+    font-size: 14px;
+  }
+
+  .player-page .player-header .brand-mark,
+  .player-page .player-header .brand-mark img,
+  .live-page .live-header .live-brand img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .player-page .player-header .header-meta {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .player-page .player-header .brand-group {
+    gap: 8px;
+  }
+
+  .player-page .player-brand-text strong,
+  .live-page .live-brand strong {
+    font-size: 12px;
+  }
+
+  .player-page .player-brand-text small,
+  .live-page .live-brand small {
+    font-size: 7px;
+    letter-spacing: 0.08em;
+  }
+
+  .player-page .player-header .header-meta {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+
+  .player-page .player-header .player-identity > span {
+    max-width: 130px;
+  }
+
+  .live-page .live-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .live-page .live-header .live-status {
+    margin-left: auto;
+  }
+}
