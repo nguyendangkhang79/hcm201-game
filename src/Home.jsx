@@ -13,7 +13,7 @@ const TOURS = [
       'Khám phá quê hương Chủ tịch Hồ Chí Minh qua các không gian Làng Sen và Hoàng Trù.',
     url: 'https://langsenkimlien.hochiminh.vn/',
     image:
-      'https://langsenkimlien.hochiminh.vn/KimLiendata/pano/thumb/thumb_01.jpg',
+      'https://langsenkimlien.hochiminh.vn/KimLiendata/pano/thumb/thumb_03.jpg',
   },
   {
     id: 'chau-van-liem',
@@ -53,7 +53,7 @@ const TOURS = [
       'Tìm hiểu nơi Chủ tịch Hồ Chí Minh viết Lời kêu gọi toàn quốc kháng chiến.',
     url: 'https://vanphuc.hochiminh.vn/',
     image:
-      'https://vanphuc.hochiminh.vn/VanPhucdata/pano/thumb/thumb_01.jpg',
+      'https://vanphuc.hochiminh.vn/VanPhucdata/pano/thumb/thumb_03.jpg',
   },
   {
     id: 'phu-chu-tich',
@@ -82,11 +82,11 @@ const HELP_STEPS = [
   ],
   [
     'Đánh dấu từ khóa',
-    'Chọn các ô trùng với từ khóa được Trọng tài công bố.',
+    'Khi ván bắt đầu, chỉ đánh dấu ô có từ khóa đã được Trọng tài công bố.',
   ],
   [
     'Hoàn thành Bingo',
-    'Đạt 5 ô liên tiếp theo hàng ngang, hàng dọc hoặc đường chéo.',
+    'Đủ 5 ô được đánh dấu theo hàng ngang, dọc hoặc chéo, hệ thống tự ghi nhận Bingo và lưu kết quả.',
   ],
 ];
 
@@ -129,7 +129,13 @@ function TourCard({ tour, index }) {
 
   return (
     <article className="tour-card">
-      <div className="tour-cover">
+      <a
+        className="tour-cover"
+        href={tour.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Tham quan ${tour.title}, mở trong tab mới`}
+      >
         {tour.image && !imageFailed ? (
           <img
             src={tour.image}
@@ -151,7 +157,7 @@ function TourCard({ tour, index }) {
         <span className="tour-number">
           {String(index + 1).padStart(2, '0')}
         </span>
-      </div>
+      </a>
 
       <div className="tour-body">
         <p className="tour-location">
@@ -170,7 +176,7 @@ function TourCard({ tour, index }) {
           rel="noopener noreferrer"
           aria-label={`Khám phá 3D ${tour.title}, mở trong tab mới`}
         >
-          Khám phá 3D
+          Mở tham quan 3D
           <Icon name="external" />
         </a>
       </div>
@@ -221,7 +227,7 @@ export default function Home() {
   };
 
   return (
-    <div className="light-home tours-home">
+    <div id="dau-trang" className="light-home tours-home">
       <header className="home-header">
         <a
           className="home-brand"
@@ -251,13 +257,6 @@ export default function Home() {
           </button>
 
           <a href="#di-tich-3d">Di tích 3D</a>
-
-          <button
-            type="button"
-            onClick={() => setDialog('help')}
-          >
-            Cách chơi
-          </button>
 
           <a className="home-nav-play" href="#tham-gia-bingo">
             Chơi Bingo
@@ -383,8 +382,9 @@ export default function Home() {
             </div>
 
             <p>
-              Từ quê hương đến những dấu mốc lịch sử. Chọn một
-              địa danh để bắt đầu khám phá.
+              Khám phá những địa danh gắn với cuộc đời và sự nghiệp
+              Chủ tịch Hồ Chí Minh, để hiểu thêm bối cảnh của chủ đề
+              học tập.
             </p>
           </div>
 
@@ -423,29 +423,49 @@ export default function Home() {
             </h2>
 
             <p>
-              Tiếp nối hành trình khám phá bằng trò chơi Bingo về
-              quá trình hình thành tư tưởng Hồ Chí Minh. Nhập tên,
-              xếp thẻ và tham gia cùng lớp.
+              Ôn lại chủ đề học tập qua bảng Bingo 5 × 5. Nhập tên
+              để vào phòng, sau đó làm theo ba bước bên dưới.
             </p>
 
             <div
-              className="bingo-details"
-              aria-label="Thông tin bảng Bingo"
+              className="bingo-quick-guide"
+              aria-labelledby="quick-guide-title"
             >
-              <span>
-                <strong>5 × 5</strong>
-                Bảng chơi
-              </span>
+              <h3 id="quick-guide-title">Cách chơi Bingo</h3>
 
-              <span>
-                <strong>25 ô</strong>
-                Trên mỗi thẻ
-              </span>
+              <ol>
+                <li>
+                  <span>01</span>
+                  <div>
+                    <strong>Xếp đủ 25 ô</strong>
+                    <p>
+                      Kéo thả từ khóa hoặc dùng chế độ
+                      “Chọn &amp; chạm”.
+                    </p>
+                  </div>
+                </li>
 
-              <span>
-                <strong>Cùng lớp</strong>
-                Chơi tương tác
-              </span>
+                <li>
+                  <span>02</span>
+                  <div>
+                    <strong>Xác nhận sẵn sàng</strong>
+                    <p>
+                      Hoàn tất bảng và chờ Trọng tài bắt đầu ván.
+                    </p>
+                  </div>
+                </li>
+
+                <li>
+                  <span>03</span>
+                  <div>
+                    <strong>Đánh dấu và hoàn thành Bingo</strong>
+                    <p>
+                      Chọn từ đã được công bố. Đủ 5 ô ngang, dọc
+                      hoặc chéo sẽ được ghi nhận tự động.
+                    </p>
+                  </div>
+                </li>
+              </ol>
             </div>
 
             <button
@@ -453,7 +473,7 @@ export default function Home() {
               type="button"
               onClick={() => setDialog('help')}
             >
-              Xem hướng dẫn chơi
+              Xem hướng dẫn chi tiết
               <Icon name="arrow" />
             </button>
           </div>
@@ -499,6 +519,7 @@ export default function Home() {
                   placeholder="Nhập tên của bạn"
                   maxLength={30}
                   autoComplete="name"
+                  aria-describedby="join-name-hint"
                   required
                 />
               </div>
@@ -512,6 +533,12 @@ export default function Home() {
                 <Icon name="arrow" />
               </button>
             </div>
+
+            <p id="join-name-hint" className="join-name-hint">
+              {playerName.trim()
+                ? 'Tên đã sẵn sàng. Bạn có thể vào phòng chơi.'
+                : 'Nhập tên để bật nút vào phòng.'}
+            </p>
 
             <p>
               <span
@@ -527,6 +554,7 @@ export default function Home() {
       <footer className="home-footer">
         <span>Bingo Hồ Chí Minh</span>
         <span>Học tập qua trải nghiệm</span>
+        <a href="#dau-trang">Về đầu trang ↑</a>
       </footer>
 
       {dialog && (
@@ -594,22 +622,29 @@ export default function Home() {
               </p>
             </div>
           ) : (
-            <ol className="help-steps">
-              {HELP_STEPS.map(
-                ([title, description], index) => (
-                  <li key={title}>
-                    <span>
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
+            <div>
+              <ol className="help-steps">
+                {HELP_STEPS.map(
+                  ([title, description], index) => (
+                    <li key={title}>
+                      <span>
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
 
-                    <div>
-                      <strong>{title}</strong>
-                      <p>{description}</p>
-                    </div>
-                  </li>
-                ),
-              )}
-            </ol>
+                      <div>
+                        <strong>{title}</strong>
+                        <p>{description}</p>
+                      </div>
+                    </li>
+                  ),
+                )}
+              </ol>
+
+              <p className="help-game-note">
+                Hãy vào phòng trước khi ván bắt đầu. Sau khi xác nhận
+                sẵn sàng, bảng sẽ được khóa để chơi.
+              </p>
+            </div>
           )}
 
           <button
