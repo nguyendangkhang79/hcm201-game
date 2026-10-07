@@ -16,6 +16,7 @@ import bgImage from './assets/bg-player.jpg';
 import './Player.css';
 import './GameHeader.css';
 import './PlayerAutoArrange.css';
+import './PlayerUX.css';
 
 const EMPTY_BOARD = () => Array(25).fill(null);
 const EMPTY_MARKS = () => Array(25).fill(false);
@@ -35,7 +36,6 @@ function shuffleWords(words, random = Math.random) {
 
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
     const target = Math.floor(random() * (index + 1));
-
     [shuffled[index], shuffled[target]] = [
       shuffled[target],
       shuffled[index],
@@ -104,7 +104,6 @@ function createAutoBoard(
   );
 
   let cursor = 0;
-
   const nextBoard = currentBoard.map(
     (word) => word || selected[cursor++],
   );
@@ -242,9 +241,7 @@ export default function Player() {
   }, [isReady]);
 
   useEffect(() => {
-    if (setupNotice?.type !== 'success') {
-      return undefined;
-    }
+    if (setupNotice?.type !== 'success') return undefined;
 
     const timeout = window.setTimeout(() => {
       setSetupNotice(null);
@@ -254,9 +251,7 @@ export default function Player() {
   }, [setupNotice]);
 
   useEffect(() => {
-    if (!playerName) {
-      navigate('/', { replace: true });
-    }
+    if (!playerName) navigate('/', { replace: true });
   }, [playerName, navigate]);
 
   useEffect(() => {
@@ -264,17 +259,13 @@ export default function Player() {
       ref(db, 'gameState/status'),
       (snapshot) => {
         const status = snapshot.val() || 'waiting';
-
         gameStatusRef.current = status;
         setGameStatus(status);
         setGameStatusLoaded(true);
 
         if (!initialStatusChecked.current) {
           initialStatusChecked.current = true;
-
-          if (status === 'playing') {
-            setGameBlocked(true);
-          }
+          if (status === 'playing') setGameBlocked(true);
         }
       },
     );
@@ -313,9 +304,7 @@ export default function Player() {
   }, []);
 
   useEffect(() => {
-    if (!playerName || gameBlocked) {
-      return undefined;
-    }
+    if (!playerName || gameBlocked) return undefined;
 
     const presenceRef = ref(
       db,
@@ -325,9 +314,7 @@ export default function Player() {
     const unsubscribeConnection = onValue(
       ref(db, '.info/connected'),
       (snapshot) => {
-        if (snapshot.val() !== true) {
-          return;
-        }
+        if (snapshot.val() !== true) return;
 
         onDisconnect(presenceRef).remove();
 
@@ -346,9 +333,7 @@ export default function Player() {
   }, [playerName, gameBlocked]);
 
   useEffect(() => {
-    if (!playerName || gameBlocked) {
-      return;
-    }
+    if (!playerName || gameBlocked) return;
 
     update(
       ref(db, `gameState/players/${playerSessionId.current}`),
@@ -376,9 +361,7 @@ export default function Player() {
   };
 
   const handleAutoArrange = () => {
-    if (!wordsLoaded || gameBlocked) {
-      return;
-    }
+    if (!wordsLoaded || gameBlocked) return;
 
     const result = createAutoBoard(board, allWords, {
       status: gameStatusRef.current,
@@ -386,10 +369,7 @@ export default function Player() {
     });
 
     if (result.error) {
-      setSetupNotice({
-        type: 'error',
-        message: result.error,
-      });
+      setSetupNotice({ type: 'error', message: result.error });
       return;
     }
 
@@ -428,12 +408,9 @@ export default function Player() {
 
   const dropOnCell = (event, destinationIndex) => {
     event.preventDefault();
-
     const item = dragItem.current;
 
-    if (!item || placementMode !== 'drag' || isLocked) {
-      return;
-    }
+    if (!item || placementMode !== 'drag' || isLocked) return;
 
     setBoard((currentBoard) => {
       const nextBoard = [...currentBoard];
@@ -443,7 +420,6 @@ export default function Player() {
       }
 
       nextBoard[destinationIndex] = item.word;
-
       return nextBoard;
     });
 
@@ -452,12 +428,9 @@ export default function Player() {
 
   const dropOnWordBank = (event) => {
     event.preventDefault();
-
     const item = dragItem.current;
 
-    if (!item || item.sourceIndex === null || isLocked) {
-      return;
-    }
+    if (!item || item.sourceIndex === null || isLocked) return;
 
     setBoard((currentBoard) => {
       const nextBoard = [...currentBoard];
@@ -538,10 +511,7 @@ export default function Player() {
 
   const removeCellWord = (event, index) => {
     event.stopPropagation();
-
-    if (isLocked) {
-      return;
-    }
+    if (isLocked) return;
 
     setSetupNotice(null);
 
@@ -553,18 +523,14 @@ export default function Player() {
   };
 
   const changePlacementMode = (mode) => {
-    if (isLocked) {
-      return;
-    }
+    if (isLocked) return;
 
     finishDrag();
     setSetupNotice(null);
     setPlacementMode(mode);
     setSelectedWord(null);
 
-    if (mode === 'tap') {
-      setWordBankOpen(true);
-    }
+    if (mode === 'tap') setWordBankOpen(true);
   };
 
   const leaveGame = () => {
@@ -580,9 +546,7 @@ export default function Player() {
     navigate('/', { replace: true });
   };
 
-  if (!playerName) {
-    return null;
-  }
+  if (!playerName) return null;
 
   if (gameBlocked) {
     return (
@@ -654,13 +618,11 @@ export default function Player() {
               <p className="result-kicker">
                 CHÚC MỪNG CHIẾN THẮNG
               </p>
-
               <h1>{playerName}</h1>
-
               <p>
-                Bạn đã hoàn thành một hàng Bingo gồm 5 ô liên tiếp.
-                Một kết quả xứng đáng cho sự tập trung và kết nối
-                xuất sắc.
+                Bạn đã hoàn thành một hàng Bingo gồm 5 ô liên
+                tiếp. Một kết quả xứng đáng cho sự tập trung và
+                kết nối xuất sắc.
               </p>
             </section>
 
@@ -697,9 +659,9 @@ export default function Player() {
 
           <footer className="result-footer">
             <p>
-              <span>★</span> HỘI NHẬP SÂU RỘNG · TỰ CHỦ VỮNG VÀNG
+              <span>★</span>
+              HỘI NHẬP SÂU RỘNG · TỰ CHỦ VỮNG VÀNG
             </p>
-
             <button
               type="button"
               onClick={() => navigate('/', { replace: true })}
@@ -717,7 +679,9 @@ export default function Player() {
 
   return (
     <div
-      className="player-page"
+      className={`player-page player-stage-${gameStatus} ${
+        isReady ? 'player-is-ready' : ''
+      }`}
       style={{ '--player-bg': `url(${bgImage})` }}
     >
       <div className="player-shell">
@@ -758,11 +722,80 @@ export default function Player() {
           </div>
         </header>
 
+        <section
+          className="play-guide"
+          aria-label="Hướng dẫn theo trạng thái ván"
+        >
+          <div className="play-guide-copy">
+            <span className="play-guide-icon" aria-hidden="true">
+              {gameStatus === 'playing'
+                ? '▶'
+                : gameStatus === 'ended'
+                  ? '■'
+                  : '✦'}
+            </span>
+
+            <div>
+              <strong>
+                {gameStatus === 'playing'
+                  ? 'Ván chơi đang diễn ra'
+                  : gameStatus === 'ended'
+                    ? 'Ván chơi đã kết thúc'
+                    : isReady
+                      ? 'Thẻ đã sẵn sàng'
+                      : 'Chuẩn bị thẻ của bạn'}
+              </strong>
+
+              <p>
+                {gameStatus === 'playing'
+                  ? 'Chạm vào từ đã được Trọng tài công bố. Đủ 5 ô ngang, dọc hoặc chéo để hoàn thành Bingo.'
+                  : gameStatus === 'ended'
+                    ? 'Chờ Trọng tài mở ván mới để tiếp tục.'
+                    : isReady
+                      ? 'Bảng đã khóa. Chờ Trọng tài bắt đầu ván chơi.'
+                      : 'Xếp đủ 25 từ khóa bằng tay hoặc dùng “Tự xếp thẻ”, rồi xác nhận sẵn sàng.'}
+              </p>
+            </div>
+          </div>
+
+          <ol className="play-steps" aria-label="Các bước tham gia">
+            <li
+              className={
+                filledCount === 25 ? 'step-done' : 'step-current'
+              }
+            >
+              <span>{filledCount === 25 ? '✓' : '1'}</span>
+              Xếp thẻ
+            </li>
+
+            <li
+              className={
+                isReady
+                  ? 'step-done'
+                  : filledCount === 25
+                    ? 'step-current'
+                    : ''
+              }
+            >
+              <span>{isReady ? '✓' : '2'}</span>
+              Sẵn sàng
+            </li>
+
+            <li
+              className={
+                gameStatus === 'playing' && isReady
+                  ? 'step-current'
+                  : ''
+              }
+            >
+              <span>3</span>
+              Chơi Bingo
+            </li>
+          </ol>
+        </section>
+
         <main className="game-layout">
-          <section
-            className="board-panel"
-            aria-label="Bảng Bingo"
-          >
+          <section className="board-panel" aria-label="Bảng Bingo">
             <div className="section-heading board-heading">
               <div>
                 <p className="eyebrow">THẺ CỦA BẠN</p>
@@ -866,11 +899,27 @@ export default function Player() {
               </div>
             )}
 
+            {gameStatus === 'playing' && (
+              <div className="board-legend" aria-label="Ý nghĩa màu ô">
+                <span>
+                  <i className="legend-waiting" aria-hidden="true" />
+                  Chưa công bố
+                </span>
+                <span>
+                  <i className="legend-unlocked" aria-hidden="true" />
+                  Có thể đánh dấu
+                </span>
+                <span>
+                  <i className="legend-marked" aria-hidden="true" />
+                  Đã đánh dấu
+                </span>
+              </div>
+            )}
+
             <div className="bingo-board">
               {board.map((word, index) => {
                 const isUnlocked =
                   Boolean(word) && unlockedWords.includes(word);
-
                 const isMarked = markedCells[index];
 
                 let stateClass = word ? 'is-filled' : 'is-empty';
@@ -879,9 +928,7 @@ export default function Player() {
                   stateClass += ' is-unlocked';
                 }
 
-                if (isMarked) {
-                  stateClass += ' is-marked';
-                }
+                if (isMarked) stateClass += ' is-marked';
 
                 return (
                   <div
@@ -921,9 +968,7 @@ export default function Player() {
                     {word ? (
                       <div
                         className={`cell-content ${
-                          draggingWord === word
-                            ? 'is-dragging'
-                            : ''
+                          draggingWord === word ? 'is-dragging' : ''
                         }`}
                         draggable={
                           !isLocked && placementMode === 'drag'
@@ -949,7 +994,10 @@ export default function Player() {
                         )}
 
                         {isMarked && (
-                          <span className="check-mark">
+                          <span
+                            className="check-mark"
+                            aria-label="Đã đánh dấu"
+                          >
                             <Icon name="check" />
                           </span>
                         )}
@@ -966,18 +1014,26 @@ export default function Player() {
 
             <div
               className={`action-bar ${
-                filledCount === 25 && !isReady
-                  ? 'needs-ready'
-                  : ''
+                filledCount === 25 && !isReady ? 'needs-ready' : ''
               }`}
             >
               <div className="action-message">
                 {isReady ? (
                   <>
                     <strong>
-                      <Icon name="check" /> Đã sẵn sàng
+                      <Icon name="check" />
+                      {gameStatus === 'playing'
+                        ? 'Đang chơi Bingo'
+                        : 'Đã sẵn sàng'}
                     </strong>
-                    <span>Chờ Trọng tài bắt đầu ván chơi</span>
+
+                    <span>
+                      {gameStatus === 'playing'
+                        ? 'Chạm vào ô đã công bố để đánh dấu hoặc bỏ đánh dấu.'
+                        : gameStatus === 'ended'
+                          ? 'Ván đã kết thúc. Chờ Trọng tài mở ván mới.'
+                          : 'Bảng đã khóa. Chờ Trọng tài bắt đầu ván chơi.'}
+                    </span>
                   </>
                 ) : (
                   <>
@@ -1012,9 +1068,7 @@ export default function Player() {
           </section>
 
           <aside
-            className={`word-panel ${
-              wordBankOpen ? 'is-open' : ''
-            }`}
+            className={`word-panel ${wordBankOpen ? 'is-open' : ''}`}
           >
             <button
               type="button"
@@ -1035,16 +1089,17 @@ export default function Player() {
                   <p className="eyebrow">CHUẨN BỊ THẺ</p>
                   <h2>Kho từ khóa</h2>
                 </div>
-
                 <span className="word-count">
                   {availableWords.length}
                 </span>
               </div>
 
               <p className="word-instruction">
-                {placementMode === 'drag'
-                  ? 'Giữ và kéo từng từ khóa vào vị trí bạn muốn trên bảng.'
-                  : 'Chọn một từ khóa bên dưới, sau đó chạm vào ô muốn đặt.'}
+                {isLocked
+                  ? 'Bảng đã khóa. Kho từ khóa bên dưới chỉ dùng để tham khảo.'
+                  : placementMode === 'drag'
+                    ? 'Kéo từ khóa vào bảng. Kéo trở lại kho để gỡ khỏi ô.'
+                    : 'Chọn một từ khóa bên dưới, sau đó chạm vào ô muốn đặt.'}
               </p>
 
               <div
@@ -1090,8 +1145,18 @@ export default function Player() {
                 {availableWords.length === 0 && (
                   <div className="empty-words">
                     <Icon name="check" />
-                    <strong>Đã dùng hết từ khóa</strong>
-                    <span>Bảng Bingo của bạn đã đầy.</span>
+                    <strong>
+                      {wordsLoaded
+                        ? 'Đã dùng hết từ khóa'
+                        : 'Đang tải từ khóa…'}
+                    </strong>
+                    <span>
+                      {filledCount === 25
+                        ? 'Bảng Bingo của bạn đã đầy.'
+                        : wordsLoaded
+                          ? 'Chờ Trọng tài bổ sung từ khóa.'
+                          : 'Vui lòng chờ trong giây lát.'}
+                    </span>
                   </div>
                 )}
               </div>
@@ -1101,10 +1166,7 @@ export default function Player() {
       </div>
 
       {needsLateConfirmation && (
-        <div
-          className="ready-modal-backdrop"
-          role="presentation"
-        >
+        <div className="ready-modal-backdrop" role="presentation">
           <section
             className="ready-modal"
             role="alertdialog"
@@ -1112,7 +1174,6 @@ export default function Player() {
             aria-labelledby="ready-modal-title"
           >
             <span className="ready-modal-icon">!</span>
-
             <p className="eyebrow">VÁN CHƠI ĐÃ BẮT ĐẦU</p>
 
             <h2 id="ready-modal-title">
