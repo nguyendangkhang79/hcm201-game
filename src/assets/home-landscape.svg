@@ -1,265 +1,170 @@
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  width="1600"
-  height="1000"
-  viewBox="0 0 1600 1000"
-  fill="none"
->
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" fill="none" xmlns:c2pa="http://c2pa.org/manifest"><metadata><c2pa:manifest>AAAWgmp1bWIAAAAeanVtZGMycGEAEQAQgAAAqgA4m3EDYzJwYQAAABZcanVtYgAAAEdqdW1kYzJtYQARABCAAACqADibcQN1cm46YzJwYTo5NzAwNmViOS04Yzk2LTQxYjUtYTZjYy0xM2JlMWYwNTBkMjQAAAADl2p1bWIAAAApanVtZGMyYXMAEQAQgAAAqgA4m3EDYzJwYS5hc3NlcnRpb25zAAAAALxqdW1iAAAARGp1bWRjYm9yABEAEIAAAKoAOJtxE2MycGEuaW5ncmVkaWVudC52MwAAAAAYYzJzaA9kdMdnD+Ptpg9WheDTKekAAABwY2JvcqNpZGM6Zm9ybWF0bWltYWdlL3N2Zyt4bWxqaW5zdGFuY2VJRHgseG1wOmlpZDpmZGE5ZjYxMS0wZTdkLTQ5MTEtOGIxYi01NjQ2OTQ2ZDg3NDdscmVsYXRpb25zaGlwaHBhcmVudE9mAAAB4mp1bWIAAABBanVtZGNib3IAEQAQgAAAqgA4m3ETYzJwYS5hY3Rpb25zLnYyAAAAABhjMnNoansDmND8hSy3ZXAfyBvtvQAAAZljYm9yomdhY3Rpb25zgqJmYWN0aW9ua2MycGEub3BlbmVkanBhcmFtZXRlcnOha2luZ3JlZGllbnRzgaJjdXJseC1zZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmluZ3JlZGllbnQudjNkaGFzaFgga0JNg84cWwbVEB3P98ZmqqLR6ITXeoLVnL2JX5lrZHKkZmFjdGlvbngdY29tLmFudGhyb3BpYy5jbGF1ZGUucHJvdmlkZWRqcGFyYW1ldGVyc6F4H2NvbS5hbnRocm9waWMub3JpZ2luLWNvbmZpZGVuY2VndW5rbm93bmtkZXNjcmlwdGlvbnhmQ2xhdWRlIHByb3ZpZGVkIHRoaXMgZmlsZSBhdCB0aGUgcmVxdWVzdCBvZiBhIHVzZXIgYW5kIG1heSBoYXZlIGNyZWF0ZWQgb3IgbW9kaWZpZWQgdGhlIGZpbGUgY29udGVudHMubXNvZnR3YXJlQWdlbnShZG5hbWVmQ2xhdWRlcmFsbEFjdGlvbnNJbmNsdWRlZPUAAADIanVtYgAAAEBqdW1kY2JvcgARABCAAACqADibcRNjMnBhLmhhc2guZGF0YQAAAAAYYzJzaD85zUNsZxyEYO7UeSKtf44AAACAY2JvcqVjYWxnZnNoYTI1NmNwYWRNAAAAAAAAAAAAAAAAAGRoYXNoWCBdm9BS0gCDMEohbxLHfGTrjgv63mrkx8IlTZvX6eGSiGRuYW1lbmp1bWJmIG1hbmlmZXN0amV4Y2x1c2lvbnOBomVzdGFydBimZmxlbmd0aBkeBAAAAj5qdW1iAAAAJ2p1bWRjMmNsABEAEIAAAKoAOJtxA2MycGEuY2xhaW0udjIAAAACD2Nib3KlY2FsZ2ZzaGEyNTZpc2lnbmF0dXJleE1zZWxmI2p1bWJmPS9jMnBhL3VybjpjMnBhOjk3MDA2ZWI5LThjOTYtNDFiNS1hNmNjLTEzYmUxZjA1MGQyNC9jMnBhLnNpZ25hdHVyZWppbnN0YW5jZUlEeCx4bXA6aWlkOjZmNzZmMDU3LTNiNzgtNDkyNi1hMjhjLTYxOTEzYjg4YzE2YXJjcmVhdGVkX2Fzc2VydGlvbnODomN1cmx4LXNlbGYjanVtYmY9YzJwYS5hc3NlcnRpb25zL2MycGEuaW5ncmVkaWVudC52M2RoYXNoWCBrQk2DzhxbBtUQHc/3xmaqotHohNd6gtWcvYlfmWtkcqJjdXJseCpzZWxmI2p1bWJmPWMycGEuYXNzZXJ0aW9ucy9jMnBhLmFjdGlvbnMudjJkaGFzaFggOd95qYAHWLbQeG5stD478LlKN7cBWH+mK+7J08pinhuiY3VybHgpc2VsZiNqdW1iZj1jMnBhLmFzc2VydGlvbnMvYzJwYS5oYXNoLmRhdGFkaGFzaFgg/nxWZGxrV0Fpt/Jp6zGwSwskdi1T+SXrdjktWxiy9BF0Y2xhaW1fZ2VuZXJhdG9yX2luZm+jZG5hbWVvQW50aHJvcGljIEZpbGVzZ3ZlcnNpb25lMS4wLjBrc3BlY1ZlcnNpb25lMi40LjAAABA4anVtYgAAAChqdW1kYzJjcwARABCAAACqADibcQNjMnBhLnNpZ25hdHVyZQAAABAIY2JvctKEWQISogEmGCFZAgowggIGMIIBjaADAgECAhRA5aAK7sI50L64g/oGQgU9Z1UTADAKBggqhkjOPQQDAzBJMRcwFQYDVQQKEw5BbnRocm9waWMsIFBCQzEuMCwGA1UEAxMlQW50aHJvcGljIENvbnRlbnQgQ3JlZGVudGlhbHMgUm9vdCBDQTAeFw0yNjA4MDcxODQzNTZaFw0yODA4MDYxOTQzNTZaMEQxFzAVBgNVBAoTDkFudGhyb3BpYywgUEJDMSkwJwYDVQQDEyBBbnRocm9waWMgQ2xhdWRlIENvbnRlbnQgU2lnbmluZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABJh6CmvLUBgFFNU0vUKlOVtE6djd17L5SuwX0LemFisBM3dkd/3cyjxFA3Qo5S46fX0/ihY0VZ7mfb9KF703t5OjWDBWMA4GA1UdDwEB/wQEAwIHgDAVBgNVHSUEDjAMBgorBgEEAYPoXgIBMAwGA1UdEwEB/wQCMAAwHwYDVR0jBBgwFoAUzlHiBIFOZFsj+OPEz5o+nMHXXMIwCgYIKoZIzj0EAwMDZwAwZAIwMXMdFJ4BetLLVY7ORuE9noqbbAZOZn/aArXyTwFAZfKrPzxF2vPoJNf1+UCdg1XGAjBwX1zd9WGqYkqmL5SFqw1QySjr1zJfpJM9+1rdDwSPLMOPOjKuiXjoU/pUUeG9RwmhY3BhZFkNngAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPZYQIQZzHjm1iq2h+RI8/qCBUoIbuvb1nT4atP7re3pakC7ilmc8pgUlOXgxPLZ79JTJg6oVlKpLD1rOYT1sMNecjk=</c2pa:manifest></metadata>
   <defs>
-    <linearGradient
-      id="hill"
-      x1="800"
-      y1="450"
-      x2="800"
-      y2="1000"
-      gradientUnits="userSpaceOnUse"
-    >
-      <stop stop-color="#44141d" stop-opacity="0"/>
-      <stop offset="1" stop-color="#220b12" stop-opacity=".8"/>
+    <!-- Nền trời đỏ rượu sẫm, sáng nhẹ ở gần đường chân núi -->
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1d070d"/>
+      <stop offset=".38" stop-color="#3d1019"/>
+      <stop offset=".62" stop-color="#5a1b22"/>
+      <stop offset="1" stop-color="#1c060b"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="800" cy="430" r="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#c8603f" stop-opacity=".34"/>
+      <stop offset=".45" stop-color="#8c2f33" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#44141d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vig" cx="800" cy="470" r="920" gradientUnits="userSpaceOnUse">
+      <stop offset=".5" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#0b0206" stop-opacity=".72"/>
+    </radialGradient>
+
+    <linearGradient id="gold" x1="30" y1="110" x2="135" y2="240" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f1d395"/><stop offset=".5" stop-color="#c39857"/><stop offset="1" stop-color="#916038"/>
     </linearGradient>
 
-    <linearGradient
-      id="gold"
-      x1="30"
-      y1="110"
-      x2="135"
-      y2="240"
-      gradientUnits="userSpaceOnUse"
-    >
-      <stop stop-color="#f1d395"/>
-      <stop offset=".5" stop-color="#c39857"/>
-      <stop offset="1" stop-color="#916038"/>
+    <!-- Các lớp núi -->
+    <linearGradient id="hillFar" x1="800" y1="450" x2="800" y2="800" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8f3f40" stop-opacity=".5"/><stop offset="1" stop-color="#5b2229" stop-opacity=".15"/>
+    </linearGradient>
+    <linearGradient id="hill" x1="800" y1="450" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5a1c25" stop-opacity=".25"/><stop offset=".55" stop-color="#34101a" stop-opacity=".85"/><stop offset="1" stop-color="#190509"/>
+    </linearGradient>
+    <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#e59a7e" stop-opacity="0"/><stop offset=".5" stop-color="#e59a7e" stop-opacity=".2"/><stop offset="1" stop-color="#e59a7e" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="ridgeLight" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#e59a7e" stop-opacity="0"/><stop offset=".5" stop-color="#f0b690" stop-opacity=".3"/><stop offset="1" stop-color="#e59a7e" stop-opacity="0"/>
     </linearGradient>
 
-    <linearGradient
-      id="stem"
-      x1="-5"
-      y1="0"
-      x2="6"
-      y2="0"
-      gradientUnits="userSpaceOnUse"
-    >
-      <stop stop-color="#1b1014"/>
-      <stop offset=".45" stop-color="#352026"/>
-      <stop offset=".7" stop-color="#42252a"/>
-      <stop offset="1" stop-color="#211016"/>
+    <!-- Thân tre: tối bên trái, ánh sáng viền bên phải -->
+    <linearGradient id="stem" x1="-6" y1="0" x2="6" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0f0609"/>
+      <stop offset=".35" stop-color="#26141a"/>
+      <stop offset=".7" stop-color="#4a2a2c"/>
+      <stop offset=".88" stop-color="#8a5a48"/>
+      <stop offset="1" stop-color="#2a1419"/>
+    </linearGradient>
+    <linearGradient id="leafG" x1="0" y1="0" x2="72" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#170a0f"/><stop offset=".55" stop-color="#2f1a1f"/><stop offset="1" stop-color="#5e3a36"/>
+    </linearGradient>
+    <linearGradient id="leafL" x1="0" y1="-8" x2="0" y2="8" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6e4a40" stop-opacity=".55"/><stop offset=".5" stop-color="#6e4a40" stop-opacity="0"/>
     </linearGradient>
 
-    <linearGradient
-      id="leafColor"
-      x1="0"
-      y1="0"
-      x2="65"
-      y2="-23"
-      gradientUnits="userSpaceOnUse"
-    >
-      <stop stop-color="#241219"/>
-      <stop offset="1" stop-color="#3e242a"/>
-    </linearGradient>
-
+    <filter id="b1" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="1.6"/></filter>
+    <filter id="b2" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="4.5"/></filter>
+    <filter id="b3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="28"/></filter>
     <filter id="grain" x="0" y="0" width="100%" height="100%">
-      <feTurbulence
-        type="fractalNoise"
-        baseFrequency=".7"
-        numOctaves="3"
-        stitchTiles="stitch"
-      />
+      <feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="3" stitchTiles="stitch"/>
       <feColorMatrix type="saturate" values="0"/>
-      <feComponentTransfer>
-        <feFuncA type="linear" slope=".055"/>
-      </feComponentTransfer>
+      <feComponentTransfer><feFuncA type="linear" slope=".06"/></feComponentTransfer>
+    </filter>
+    <filter id="paper" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".012 .02" numOctaves="4" seed="7"/>
+      <feColorMatrix values="0 0 0 0 .55  0 0 0 0 .25  0 0 0 0 .22  0 0 0 .5 -.12"/>
     </filter>
 
-    <!-- Lá tre: bản lá thuôn, đầu nhọn và gân lá mảnh. -->
+    <!-- Lá tre: thuôn, nhọn đầu, có gân và mép sáng -->
     <g id="leaf">
-      <path
-        d="M0 0C16-18 42-23 65-23 48-15 28 2 0 0Z"
-        fill="url(#leafColor)"
-      />
-      <path
-        d="M3-1Q28-12 60-22"
-        stroke="#735047"
-        stroke-opacity=".18"
-        stroke-width=".6"
-      />
+      <path d="M0 0C13-9 43-11 76 1 44 8 15 7 0 0Z" fill="url(#leafG)"/>
+      <path d="M0 0C13-9 43-11 76 1 44-3 15-3 0 0Z" fill="url(#leafL)"/>
+      <path d="M2 0Q40-4 74 1" stroke="#b58a70" stroke-opacity=".3" stroke-width=".6"/>
     </g>
-
-    <!-- Chùm lá mọc so le theo cành cong. -->
+    <!-- Cành lá rủ, 7 lá so le -->
     <g id="spray">
-      <path
-        d="M0 0Q35-24 86-35"
-        stroke="#2c161e"
-        stroke-width="1.5"
-        stroke-linecap="round"
-      />
-      <use
-        href="#leaf"
-        transform="translate(9 -7) rotate(-38) scale(.72)"
-      />
-      <use
-        href="#leaf"
-        transform="translate(24 -17) rotate(53) scale(.8)"
-      />
-      <use
-        href="#leaf"
-        transform="translate(38 -23) rotate(-27) scale(.86)"
-      />
-      <use
-        href="#leaf"
-        transform="translate(54 -29) rotate(61) scale(.72)"
-      />
-      <use
-        href="#leaf"
-        transform="translate(72 -33) rotate(-8) scale(.76)"
-      />
+      <path d="M0 0Q30-15 72-11" stroke="#1f0f15" stroke-width="1.5" stroke-linecap="round"/>
+      <use href="#leaf" transform="translate(6 -4) rotate(31) scale(.68)"/>
+      <use href="#leaf" transform="translate(15 -8) rotate(-24) scale(.6)"/>
+      <use href="#leaf" transform="translate(27 -12) rotate(48) scale(.8)"/>
+      <use href="#leaf" transform="translate(37 -14) rotate(-12) scale(.72)"/>
+      <use href="#leaf" transform="translate(50 -14) rotate(63) scale(.74)"/>
+      <use href="#leaf" transform="translate(60 -13) rotate(-30) scale(.62)"/>
+      <use href="#leaf" transform="translate(71 -11) rotate(22) scale(.84)"/>
     </g>
-
-    <!-- Thân tre hơi cong, có đốt và ánh sáng nhẹ. -->
+    <!-- Thân tre: thon dần, đốt có gờ, vệt sáng và vệt nứt nhỏ -->
     <g id="culm">
-      <path
-        d="M-5 8C-3-64 0-128-3-196S-9-334-3-405L2-405C-3-334 3-263 3-196S3-64 5 8Z"
-        fill="url(#stem)"
-      />
-      <path
-        d="M-4-71Q0-73 5-71M-4-143Q0-145 4-143M-7-215Q-2-217 3-215M-7-285Q-3-287 2-285M-6-354Q-2-356 2-354"
-        stroke="#634038"
-        stroke-width="2"
-        stroke-opacity=".55"
-        stroke-linecap="round"
-      />
-      <path
-        d="M-2 0Q1-80-1-143M-2-150Q-2-185-4-210M-4-222Q-6-254-4-280M-4-294Q-4-325-2-350"
-        stroke="#735047"
-        stroke-width=".8"
-        stroke-opacity=".23"
-      />
+      <path d="M-6.5 8C-4-64-1-128-3.5-196S-6-334-2-405L2-405C0-334 4.5-263 4.5-196S5.5-64 6.5 8Z" fill="url(#stem)"/>
+      <path d="M-3 0Q-1-100-3.5-200T-1-400" stroke="#000" stroke-opacity=".35" stroke-width="2"/>
+      <path d="M3 4C4-64 4.5-128 3.5-196S2.5-334 1-400" stroke="#e0a584" stroke-opacity=".28" stroke-width="1.1"/>
+      <g stroke-linecap="round">
+        <path d="M-7-71Q0-75 7-71M-6.5-143Q0-147 6-143M-6-215Q0-219 5.5-215M-5.5-285Q0-289 5-285M-5-354Q0-358 4.5-354" stroke="#0c0407" stroke-width="3.6" stroke-opacity=".8"/>
+        <path d="M-6-74Q0-78 6-74M-6-146Q0-150 5.5-146M-5.5-218Q0-222 5-218M-5-288Q0-292 4.5-288M-4.5-357Q0-361 4-357" stroke="#c99274" stroke-opacity=".42" stroke-width=".9"/>
+      </g>
+      <path d="M-1-30V-60M1-100V-130M-2-165V-195M0-235V-265" stroke="#6b4338" stroke-opacity=".3" stroke-width=".7"/>
     </g>
-
-    <!-- Một bụi tre gồm nhiều thân và cành khác nhau. -->
+    <!-- Bụi tre: 3 thân + cành + nhiều chùm lá -->
     <g id="bamboo">
       <use href="#culm" transform="rotate(-3)"/>
-      <use
-        href="#culm"
-        transform="translate(38 18) rotate(4) scale(.76)"
-      />
-      <use
-        href="#culm"
-        transform="translate(-35 28) rotate(-8) scale(.61)"
-      />
-
-      <g stroke="#28141b" stroke-linecap="round">
-        <path
-          d="M-11-284Q17-312 47-323M-8-216Q-37-237-68-244M-4-144Q22-169 50-176M1-72Q-27-100-61-103"
-          stroke-width="2.4"
-        />
-        <path
-          d="M52-144Q70-164 99-170M46-89Q24-105 9-118M-54-121Q-80-142-100-143"
-          stroke-width="1.8"
-        />
+      <use href="#culm" transform="translate(38 18) rotate(4) scale(.76)"/>
+      <use href="#culm" transform="translate(-35 28) rotate(-8) scale(.61)"/>
+      <g stroke="#22101a" stroke-linecap="round">
+        <path d="M-11-284Q17-312 47-323M-8-216Q-37-237-68-244M-4-144Q22-169 50-176M1-72Q-27-100-61-103" stroke-width="2.4"/>
+        <path d="M52-144Q70-164 99-170M46-89Q24-105 9-118M-54-121Q-80-142-100-143M-14-340Q-30-362-52-370" stroke-width="1.8"/>
       </g>
-
-      <use
-        href="#spray"
-        transform="translate(17 -311) rotate(-7) scale(.86)"
-      />
-      <use
-        href="#spray"
-        transform="translate(39 -321) rotate(38) scale(.64)"
-      />
-      <use
-        href="#spray"
-        transform="translate(-34 -236) rotate(178) scale(.88)"
-      />
-      <use
-        href="#spray"
-        transform="translate(-55 -241) rotate(140) scale(.61)"
-      />
-      <use
-        href="#spray"
-        transform="translate(23 -165) rotate(13) scale(.93)"
-      />
-      <use
-        href="#spray"
-        transform="translate(-23 -95) rotate(170) scale(.82)"
-      />
-      <use
-        href="#spray"
-        transform="translate(74 -162) rotate(24) scale(.65)"
-      />
-      <use
-        href="#spray"
-        transform="translate(27 -102) rotate(155) scale(.52)"
-      />
-      <use
-        href="#spray"
-        transform="translate(-78 -136) rotate(169) scale(.55)"
-      />
+      <use href="#spray" transform="translate(17 -311) rotate(-7) scale(.9)"/>
+      <use href="#spray" transform="translate(39 -321) rotate(38) scale(.66)"/>
+      <use href="#spray" transform="translate(-2 -392) rotate(-62) scale(.62)"/>
+      <use href="#spray" transform="translate(-46 -366) rotate(-150) scale(.62)"/>
+      <use href="#spray" transform="translate(-34 -236) rotate(178) scale(.92)"/>
+      <use href="#spray" transform="translate(-55 -241) rotate(140) scale(.64)"/>
+      <use href="#spray" transform="translate(23 -165) rotate(13) scale(.96)"/>
+      <use href="#spray" transform="translate(-23 -95) rotate(170) scale(.85)"/>
+      <use href="#spray" transform="translate(74 -162) rotate(24) scale(.68)"/>
+      <use href="#spray" transform="translate(96 -168) rotate(-10) scale(.5)"/>
+      <use href="#spray" transform="translate(27 -102) rotate(155) scale(.54)"/>
+      <use href="#spray" transform="translate(-78 -136) rotate(169) scale(.58)"/>
+      <use href="#spray" transform="translate(-98 -142) rotate(195) scale(.45)"/>
     </g>
   </defs>
 
-  <!-- Ngôi sao năm cánh cân đối với các mặt sáng tối nhẹ. -->
-  <g opacity=".14">
-    <path
-      d="M80 105 97.63 159.27 154.69 159.27 108.53 192.81 126.16 247.08 80 213.54 33.84 247.08 51.47 192.81 5.31 159.27 62.37 159.27Z"
-      fill="url(#gold)"
-    />
-    <path
-      d="M80 183.54 80 105 97.63 159.27ZM80 183.54 154.69 159.27 108.53 192.81ZM80 183.54 126.16 247.08 80 213.54Z"
-      fill="#fff0bd"
-      opacity=".22"
-    />
-    <path
-      d="M80 183.54 33.84 247.08 51.47 192.81ZM80 183.54 5.31 159.27 62.37 159.27Z"
-      fill="#573023"
-      opacity=".16"
-    />
-  </g>
+  <!-- Nền -->
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+  <rect width="1600" height="1000" fill="url(#glow)"/>
+  <rect width="1600" height="1000" filter="url(#paper)" opacity=".5"/>
 
-  <!-- Các đường trang trí mờ ở góc trái. -->
+  <!-- Ngôi sao năm cánh (góc trái, mờ) -->
+  <g opacity=".15">
+    <path d="M80 105 97.63 159.27 154.69 159.27 108.53 192.81 126.16 247.08 80 213.54 33.84 247.08 51.47 192.81 5.31 159.27 62.37 159.27Z" fill="url(#gold)"/>
+    <path d="M80 183.54 80 105 97.63 159.27ZM80 183.54 154.69 159.27 108.53 192.81ZM80 183.54 126.16 247.08 80 213.54Z" fill="#fff0bd" opacity=".22"/>
+    <path d="M80 183.54 33.84 247.08 51.47 192.81ZM80 183.54 5.31 159.27 62.37 159.27Z" fill="#573023" opacity=".16"/>
+  </g>
+  <!-- Đường chéo trang trí góc trái -->
   <g stroke="#a2524e" opacity=".07">
-    <path
-      d="M-200-80 500 450M-200-40 480 470M-200 0 460 490M-200 40 440 510M-200 80 420 530M-200 120 400 550M-200 160 380 570M-200 200 360 590"
-    />
+    <path d="M-200-80 500 450M-200-40 480 470M-200 0 460 490M-200 40 440 510M-200 80 420 530M-200 120 400 550M-200 160 380 570M-200 200 360 590"/>
   </g>
 
-  <!-- Lớp núi phía xa. -->
-  <path
-    d="m0 600 90-62 82 21 77-88 90 84 100-27 96 68 103-92 110 80 120-29 116 44 110-145 90-55 86 67 90-39 91 84 54-29v523H0Z"
-    fill="url(#hill)"
-  />
+  <!-- Núi xa, nhạt, mờ sương -->
+  <path d="m0 560 100-50 90 26 80-70 95 72 105-34 100 62 105-82 115 72 125-40 120 38 115-130 95-50 90 62 95-36 95 80 60-26v600H0Z" fill="url(#hillFar)" filter="url(#b1)"/>
+  <rect y="480" width="1600" height="150" fill="url(#mist)"/>
 
-  <g stroke="#9c554c" stroke-width="1" opacity=".11">
-    <path
-      d="m0 645 90-62 82 21 77-88 90 84M1170 479l75-37 86 67 90-39 91 84 88-29M1125 608l110-82 90 99 94-33 102 93 79-9M0 710l112-37 110 60 105-10M0 760l110-28 117 62 90-12M1210 710l103-41 107 90 180-19"
-    />
+  <!-- Núi chính (hình dáng gốc) -->
+  <path d="m0 600 90-62 82 21 77-88 90 84 100-27 96 68 103-92 110 80 120-29 116 44 110-145 90-55 86 67 90-39 91 84 54-29v523H0Z" fill="url(#hill)"/>
+  <!-- Ánh sáng viền sườn núi -->
+  <path d="m0 600 90-62 82 21 77-88 90 84 100-27 96 68 103-92 110 80 120-29 116 44 110-145 90-55 86 67 90-39 91 84 54-29" stroke="url(#ridgeLight)" stroke-width="1.6" opacity=".7"/>
+  <g stroke="#9c554c" stroke-width="1" opacity=".12">
+    <path d="m0 645 90-62 82 21 77-88 90 84M1170 479l75-37 86 67 90-39 91 84 88-29M1125 608l110-82 90 99 94-33 102 93 79-9M0 710l112-37 110 60 105-10M0 760l110-28 117 62 90-12M1210 710l103-41 107 90 180-19"/>
+  </g>
+  <rect y="600" width="1600" height="170" fill="url(#mist)" opacity=".85"/>
+
+  <!-- Tre lớp sau: mờ, tạo chiều sâu -->
+  <g opacity=".28" filter="url(#b2)">
+    <use href="#bamboo" transform="translate(250 990) scale(.8 .95)"/>
+    <use href="#bamboo" transform="translate(1340 1000) scale(-.85 1)"/>
   </g>
 
-  <!-- Hai cụm tre ở mép, khác kích thước và góc nghiêng. -->
-  <g opacity=".58">
-    <use
-      href="#bamboo"
-      transform="translate(30 970) scale(1.02 1.14)"
-    />
-    <use
-      href="#bamboo"
-      transform="translate(108 1025) rotate(5) scale(.58 .72)"
-      opacity=".72"
-    />
-    <use
-      href="#bamboo"
-      transform="translate(1550 1010) scale(-1.08 1.38)"
-    />
-    <use
-      href="#bamboo"
-      transform="translate(1465 1040) rotate(-5) scale(-.58 .78)"
-      opacity=".68"
-    />
+  <!-- Hai cụm tre ở mép (bố cục gốc) -->
+  <g opacity=".72">
+    <use href="#bamboo" transform="translate(30 970) scale(1.02 1.14)"/>
+    <use href="#bamboo" transform="translate(108 1025) rotate(5) scale(.58 .72)" opacity=".75" filter="url(#b1)"/>
+    <use href="#bamboo" transform="translate(1550 1010) scale(-1.08 1.38)"/>
+    <use href="#bamboo" transform="translate(1465 1040) rotate(-5) scale(-.58 .78)" opacity=".72" filter="url(#b1)"/>
   </g>
 
-  <rect
-    width="1600"
-    height="1000"
-    filter="url(#grain)"
-    opacity=".5"
-  />
+  <!-- Sương thấp quanh gốc tre -->
+  <ellipse cx="150" cy="1000" rx="360" ry="70" fill="#d98f78" opacity=".2" filter="url(#b3)"/>
+  <ellipse cx="1470" cy="1000" rx="380" ry="80" fill="#d98f78" opacity=".2" filter="url(#b3)"/>
+  <ellipse cx="800" cy="990" rx="800" ry="60" fill="#c9705f" opacity=".1" filter="url(#b3)"/>
+
+  <!-- Viền tối + hạt phim -->
+  <rect width="1600" height="1000" fill="url(#vig)"/>
+  <rect width="1600" height="1000" filter="url(#grain)" opacity=".55"/>
 </svg>

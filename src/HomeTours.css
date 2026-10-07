@@ -1,13 +1,27 @@
-/* Nạp sau Home.css để bổ sung phần tham quan 3D. */
+/* Nạp sau Home.css. */
 
 .tours-home > main {
   width: 100%;
 }
 
+.tours-home {
+  background: radial-gradient(
+    ellipse at 50% 15%,
+    #63232d 0%,
+    #4a1720 50%,
+    #361018 100%
+  );
+}
+
+/* Họa tiết đi cùng khung nhìn khi cuộn xuống cuối trang. */
 .tours-home::before {
-  background-size: 100% auto;
-  background-position: center top;
-  opacity: 0.45;
+  position: fixed;
+  inset: 0;
+  background:
+    url('./assets/home-landscape.svg')
+    center bottom / cover no-repeat;
+  opacity: 0.38;
+  pointer-events: none;
 }
 
 .tours-home .home-main {
@@ -56,7 +70,7 @@
   height: 16px;
 }
 
-/* Nút ở phần giới thiệu */
+/* Nút phần giới thiệu */
 
 .tour-hero-actions {
   display: flex;
@@ -117,7 +131,7 @@
   margin: 0;
 }
 
-/* Kích thước chung các phần bên dưới */
+/* Kích thước các phần bên dưới */
 
 .tour-section,
 .bingo-section {
@@ -126,7 +140,7 @@
   scroll-margin-top: 24px;
 }
 
-/* Phần giới thiệu di tích */
+/* Phần di tích */
 
 .tour-section {
   padding: 48px 0 54px;
@@ -163,7 +177,7 @@
   line-height: 1.8;
 }
 
-/* Lưới 6 thẻ */
+/* Thẻ tham quan */
 
 .tour-grid {
   display: grid;
@@ -191,8 +205,6 @@
   border-color: #e8c37d80;
   box-shadow: 0 12px 28px #20060d30;
 }
-
-/* Ảnh và nhãn trên thẻ */
 
 .tour-cover {
   position: relative;
@@ -247,7 +259,7 @@
   line-height: 1;
 }
 
-/* Khung thay thế khi chưa có ảnh hoặc ảnh không tải được */
+/* Khung thay thế nếu ảnh bên ngoài không tải được */
 
 .tour-cover-fallback {
   display: flex;
@@ -273,8 +285,6 @@
   font-size: 19px;
   line-height: 1.5;
 }
-
-/* Nội dung thẻ */
 
 .tour-body {
   display: flex;
@@ -353,17 +363,62 @@
   margin-top: 3px;
 }
 
-/* Phần tham gia Bingo */
+/* Khung vào chơi Bingo */
 
 .bingo-section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: grid;
   grid-template-columns:
     minmax(0, 1fr)
     minmax(0, 1.1fr);
   align-items: center;
-  gap: 54px;
-  padding: 42px 0 58px;
-  border-top: 1px solid #e8c37d38;
+  gap: 48px;
+  padding: 44px;
+  margin: 12px auto 56px;
+  border: 1px solid #e8c37d55;
+  border-radius: 22px;
+  background:
+    radial-gradient(
+      ellipse at 0% 0%,
+      #96534a35,
+      transparent 65%
+    ),
+    linear-gradient(120deg, #5a202be8, #361018e8);
+  box-shadow:
+    0 20px 60px #16030b35,
+    inset 0 1px 0 #fff5e512;
+}
+
+/* Họa tiết riêng bên trong khung */
+
+.bingo-section::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    url('./assets/home-landscape.svg')
+    center bottom / cover no-repeat;
+  opacity: 0.32;
+  pointer-events: none;
+}
+
+.bingo-section::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 300px;
+  height: 300px;
+  left: -80px;
+  top: -100px;
+  border: 1px solid #e8c37d16;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 28px #e8c37d06,
+    0 0 0 56px #e8c37d04;
+  pointer-events: none;
 }
 
 .bingo-intro .topic-label {
@@ -382,6 +437,33 @@
   color: var(--muted);
   font-size: 14px;
   line-height: 1.8;
+}
+
+.bingo-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 24px;
+}
+
+.bingo-details > span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.bingo-details > span + span {
+  padding-left: 22px;
+  border-left: 1px solid #e8c37d30;
+}
+
+.bingo-details strong {
+  color: var(--gold);
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .bingo-help {
@@ -405,15 +487,42 @@
   height: 17px;
 }
 
-/* Form dùng lại các kiểu trong Home.css */
+/* Form màu kem */
 
 .tours-home .bingo-section .join-card {
   padding: 28px;
+  border: 1px solid #f1d9ad;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #fffaf0, #f7eddb);
+  box-shadow: 0 12px 32px #16030b30;
+}
+
+.bingo-form-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bingo-form-header > div {
+  min-width: 0;
+}
+
+.bingo-form-mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: 1px solid #d8b779;
+  border-radius: 12px;
+  background: #611e2a;
+  color: #e8c37d;
+  font-size: 24px;
 }
 
 .tours-home .join-card .bingo-form-kicker {
   display: block;
-  margin: 0 0 8px;
+  margin: 0 0 4px;
   color: #843345;
   font-size: 9px;
   font-weight: 700;
@@ -421,12 +530,20 @@
 }
 
 .tours-home .join-card h3 {
-  margin: 0 0 22px;
+  margin: 0;
   color: #4a1720;
   font-family: var(--serif);
   font-size: 25px;
   font-weight: 600;
   line-height: 1.4;
+}
+
+.tours-home .join-card > .bingo-form-description {
+  display: block;
+  margin: 14px 0 22px;
+  color: #796760;
+  font-size: 12px;
+  line-height: 1.7;
 }
 
 .tours-home .bingo-section .join-row {
@@ -435,6 +552,13 @@
 
 .tours-home .bingo-section .join-button {
   font-size: 14px;
+}
+
+.tours-home .bingo-section .join-button:disabled {
+  background: #70434b;
+  border-color: #70434b;
+  color: #fff8ea;
+  opacity: 0.8;
 }
 
 /* Laptop */
@@ -471,6 +595,7 @@
 
   .bingo-section {
     gap: 30px;
+    padding: 32px;
   }
 }
 
@@ -507,6 +632,7 @@
   .bingo-section {
     grid-template-columns: 1fr;
     gap: 28px;
+    padding: 30px;
   }
 
   .bingo-intro > p:not(.topic-label) {
@@ -581,7 +707,27 @@
   }
 
   .bingo-section {
-    padding: 32px 0 38px;
+    padding: 24px 18px;
+    margin: 12px auto 32px;
+    border-radius: 16px;
+  }
+
+  .bingo-details {
+    gap: 14px;
+  }
+
+  .bingo-details > span + span {
+    padding-left: 14px;
+  }
+
+  .tours-home .join-card h3 {
+    font-size: 21px;
+  }
+
+  .bingo-form-mark {
+    width: 38px;
+    height: 38px;
+    font-size: 21px;
   }
 
   .tours-home .bingo-section .join-card {
@@ -592,8 +738,6 @@
     grid-template-columns: 1fr;
   }
 }
-
-/* Hạn chế chuyển động theo cài đặt của người dùng */
 
 @media (prefers-reduced-motion: reduce) {
   .tours-home .tour-card {

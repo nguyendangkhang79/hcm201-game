@@ -62,7 +62,8 @@ const TOURS = [
     description:
       'Khám phá không gian gắn với đời sống và công việc của Chủ tịch Hồ Chí Minh.',
     url: 'http://phuchutich.egal.vn/',
-    image: null,
+    image:
+      'https://nhasanbacho.vn/wp-content/uploads/2023/08/080814181932.png',
   },
 ];
 
@@ -111,9 +112,7 @@ function Icon({ name }) {
       </>
     ),
     building: (
-      <>
-        <path d="m3 9 9-6 9 6H3ZM5 10v9m5-9v9m4-9v9m5-9v9M3 21h18" />
-      </>
+      <path d="m3 9 9-6 9 6H3ZM5 10v9m5-9v9m4-9v9m5-9v9M3 21h18" />
     ),
     close: <path d="m6 6 12 12M6 18 18 6" />,
   };
@@ -216,9 +215,7 @@ export default function Home() {
 
     if (name) {
       navigate('/play', {
-        state: {
-          playerName: name,
-        },
+        state: { playerName: name },
       });
     }
   };
@@ -262,10 +259,7 @@ export default function Home() {
             Cách chơi
           </button>
 
-          <a
-            className="home-nav-play"
-            href="#tham-gia-bingo"
-          >
+          <a className="home-nav-play" href="#tham-gia-bingo">
             Chơi Bingo
             <Icon name="arrow" />
           </a>
@@ -296,10 +290,7 @@ export default function Home() {
             </p>
 
             <div className="tour-hero-actions">
-              <a
-                className="tour-primary"
-                href="#di-tich-3d"
-              >
+              <a className="tour-primary" href="#di-tich-3d">
                 Khám phá di tích 3D
                 <Icon name="arrow" />
               </a>
@@ -437,6 +428,26 @@ export default function Home() {
               xếp thẻ và tham gia cùng lớp.
             </p>
 
+            <div
+              className="bingo-details"
+              aria-label="Thông tin bảng Bingo"
+            >
+              <span>
+                <strong>5 × 5</strong>
+                Bảng chơi
+              </span>
+
+              <span>
+                <strong>25 ô</strong>
+                Trên mỗi thẻ
+              </span>
+
+              <span>
+                <strong>Cùng lớp</strong>
+                Chơi tương tác
+              </span>
+            </div>
+
             <button
               className="bingo-help"
               type="button"
@@ -451,11 +462,26 @@ export default function Home() {
             className="join-card"
             onSubmit={handleJoinRoom}
           >
-            <p className="bingo-form-kicker">
-              SẴN SÀNG CHINH PHỤC THỬ THÁCH?
-            </p>
+            <div className="bingo-form-header">
+              <span
+                className="bingo-form-mark"
+                aria-hidden="true"
+              >
+                ★
+              </span>
 
-            <h3>Tham gia phòng Bingo</h3>
+              <div>
+                <p className="bingo-form-kicker">
+                  HỌC TẬP QUA TRÒ CHƠI
+                </p>
+
+                <h3>Tham gia phòng Bingo</h3>
+              </div>
+            </div>
+
+            <p className="bingo-form-description">
+              Nhập tên của bạn để bắt đầu xếp thẻ.
+            </p>
 
             <label htmlFor="player-name">Tên người chơi</label>
 
