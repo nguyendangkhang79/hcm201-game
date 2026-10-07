@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { onValue, push, ref, set, update } from 'firebase/database';
 import { db } from './firebase';
 import Chat from './Chat';
+import './Admin.css';
 
 export default function Admin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -11,66 +12,512 @@ export default function Admin() {
   const [newWord, setNewWord] = useState('');
   const [gameStatus, setGameStatus] = useState('waiting');
   const [players, setPlayers] = useState([]);
+
   const ADMIN_PIN = '123456';
 
   useEffect(() => {
     if (!isAuthenticated) return undefined;
-    const unsubscribeWords = onValue(ref(db, 'gameState/wordList'), (snapshot) => setWordList(Object.values(snapshot.val() || {})));
-    const unsubscribeActive = onValue(ref(db, 'gameState/activeWords'), (snapshot) => setActiveWords(Object.values(snapshot.val() || {})));
-    const unsubscribeStatus = onValue(ref(db, 'gameState/status'), (snapshot) => setGameStatus(snapshot.val() || 'waiting'));
-    const unsubscribePlayers = onValue(ref(db, 'gameState/players'), (snapshot) => setPlayers(Object.values(snapshot.val() || {})));
-    return () => { unsubscribeWords(); unsubscribeActive(); unsubscribeStatus(); unsubscribePlayers(); };
+
+    const unsubscribeWords = onValue(
+      ref(db, 'gameState/wordList'),
+      (snapshot) =>
+        setWordList(Object.values(snapshot.val() || {})),
+    );
+
+    const unsubscribeActive = onValue(
+      ref(db, 'gameState/activeWords'),
+      (snapshot) =>
+        setActiveWords(Object.values(snapshot.val() || {})),
+    );
+
+    const unsubscribeStatus = onValue(
+      ref(db, 'gameState/status'),
+      (snapshot) => setGameStatus(snapshot.val() || 'waiting'),
+    );
+
+    const unsubscribePlayers = onValue(
+      ref(db, 'gameState/players'),
+      (snapshot) =>
+        setPlayers(Object.values(snapshot.val() || {})),
+    );
+
+    return () => {
+      unsubscribeWords();
+      unsubscribeActive();
+      unsubscribeStatus();
+      unsubscribePlayers();
+    };
   }, [isAuthenticated]);
 
   const handleLogin = (event) => {
     event.preventDefault();
-    if (pinCode === ADMIN_PIN) setIsAuthenticated(true);
-    else { alert('Sai mã PIN!'); setPinCode(''); }
+
+    if (pinCode === ADMIN_PIN) {
+      setIsAuthenticated(true);
+    } else {
+      alert('Sai mã PIN!');
+      setPinCode('');
+    }
   };
 
   const handleAddWord = (event) => {
     event.preventDefault();
+
     const word = newWord.trim();
+
     if (!word) return;
-    if (wordList.includes(word)) { alert('Từ này đã tồn tại!'); return; }
-    push(ref(db, 'gameState/wordList'), word)
-      .catch(() => alert('Không thêm được từ khóa! Kiểm tra kết nối hoặc quyền Firebase.'));
+
+    if (wordList.includes(word)) {
+      alert('Từ này đã tồn tại!');
+      return;
+    }
+
+    push(ref(db, 'gameState/wordList'), word).catch(() =>
+      alert(
+        'Không thêm được từ khóa! Kiểm tra kết nối hoặc quyền Firebase.',
+      ),
+    );
+
     setNewWord('');
   };
 
   const unlockWord = (word) => {
-    if (gameStatus !== 'playing') { alert('Vui lòng bắt đầu trò chơi trước khi phát lệnh!'); return; }
-    if (!activeWords.includes(word)) push(ref(db, 'gameState/activeWords'), word);
+    if (gameStatus !== 'playing') {
+      alert('Vui lòng bắt đầu trò chơi trước khi phát lệnh!');
+      return;
+    }
+
+    if (!activeWords.includes(word)) {
+      push(ref(db, 'gameState/activeWords'), word);
+    }
   };
 
   const startGame = () => {
-    const readyCount = players.filter((player) => player.ready).length;
+    const readyCount = players.filter(
+      (player) => player.ready,
+    ).length;
+
     const notReadyCount = players.length - readyCount;
-    if (notReadyCount > 0 && !window.confirm(`${notReadyCount}/${players.length} người chơi chưa sẵn sàng. Bạn vẫn muốn bắt đầu ván?`)) return;
+
+    if (
+      notReadyCount > 0 &&
+      !window.confirm(
+        `${notReadyCount}/${players.length} người chơi chưa sẵn sàng. Bạn vẫn muốn bắt đầu ván?`,
+      )
+    ) {
+      return;
+    }
+
     set(ref(db, 'gameState/status'), 'playing');
   };
 
   const resetMatch = () => {
-    if (window.confirm('Bắt đầu ván mới? Toàn bộ dấu Bingo và bảng xếp hạng hiện tại sẽ bị xóa.')) {
-      update(ref(db, 'gameState'), { activeWords: null, status: 'waiting', winners: null, winnerCount: null });
+    if (
+      window.confirm(
+        'Bắt đầu ván mới? Toàn bộ dấu Bingo và bảng xếp hạng hiện tại sẽ bị xóa.',
+      )
+    ) {
+      update(ref(db, 'gameState'), {
+        activeWords: null,
+        status: 'waiting',
+        winners: null,
+        winnerCount: null,
+      });
     }
   };
 
+  const readyCount = players.filter(
+    (player) => player.ready,
+  ).length;
+
+  const allReady =
+    players.length > 0 && readyCount === players.length;
+
+  const pendingCount = wordList.filter(
+    (word) => !activeWords.includes(word),
+  ).length;
+
+  const statusLabel =
+    gameStatus === 'playing'
+      ? 'Đang diễn ra'
+      : gameStatus === 'ended'
+        ? 'Đã kết thúc'
+        : 'Đang chuẩn bị';
+
   if (!isAuthenticated) {
-    return <div className="flex items-center justify-center h-screen bg-gray-100"><div className="bg-white p-8 rounded-xl shadow-lg border max-w-sm w-full"><h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Xác thực Trọng Tài</h2><form onSubmit={handleLogin} className="flex flex-col gap-4"><input type="password" placeholder="Nhập mã PIN..." value={pinCode} onChange={(event) => setPinCode(event.target.value)} className="border-2 p-3 rounded-lg text-center text-lg tracking-widest focus:border-blue-500 outline-none" autoFocus /><button type="submit" className="bg-blue-600 text-white font-bold py-3 rounded-lg">Mở khóa</button></form></div></div>;
+    return (
+      <div className="admin-page admin-login-page">
+        <main className="admin-login-card">
+          <div className="admin-login-brand">
+            <span aria-hidden="true">★</span>
+            THEO DẤU CHÂN BÁC
+          </div>
+
+          <p className="admin-eyebrow">KHU VỰC QUẢN LÍ</p>
+          <h1>Xác thực Trọng tài</h1>
+
+          <p className="admin-login-description">
+            Nhập mã PIN để điều khiển phòng Bingo.
+          </p>
+
+          <form
+            onSubmit={handleLogin}
+            className="admin-login-form"
+          >
+            <label htmlFor="admin-pin">Mã PIN</label>
+
+            <input
+              id="admin-pin"
+              className="admin-input admin-pin-input"
+              type="password"
+              placeholder="Nhập mã PIN…"
+              value={pinCode}
+              onChange={(event) =>
+                setPinCode(event.target.value)
+              }
+              autoFocus
+            />
+
+            <button
+              type="submit"
+              className="admin-button admin-button-primary"
+            >
+              Mở khóa quản lí
+            </button>
+          </form>
+
+          <a className="admin-home-link" href="/">
+            ← Về trang chủ
+          </a>
+        </main>
+      </div>
+    );
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto bg-gray-50 min-h-screen font-sans">
-      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b-2 border-gray-200 pb-4 mb-6">
-        <div><h1 className="text-3xl font-extrabold text-red-600 tracking-tight m-0">Trạm Quản Trị Bingo</h1><a href="/live" target="_blank" rel="noreferrer" className="inline-flex mt-2 text-sm font-bold text-blue-600 hover:underline">Mở màn hình trực tiếp ↗</a></div>
-        <div className="text-sm font-medium">Trạng thái: <span className={`ml-2 font-bold ${gameStatus === 'playing' ? 'text-green-600' : gameStatus === 'ended' ? 'text-red-600' : 'text-amber-500'}`}>{gameStatus === 'playing' ? 'ĐANG CHƠI' : gameStatus === 'ended' ? 'ĐÃ KẾT THÚC' : 'ĐANG CHỜ BẮT ĐẦU'}</span></div>
+    <div className="admin-page">
+      <header className="admin-topbar">
+        <div className="admin-topbar-inner">
+          <a
+            className="admin-brand"
+            href="/"
+            aria-label="Theo dấu chân Bác - Trang chủ"
+          >
+            <span
+              className="admin-brand-mark"
+              aria-hidden="true"
+            >
+              ★
+            </span>
+
+            <span>
+              <strong>THEO DẤU CHÂN BÁC</strong>
+              <small>QUẢN LÍ PHÒNG BINGO</small>
+            </span>
+          </a>
+
+          <a
+            className="admin-live-link"
+            href="/live"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Màn hình trực tiếp
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
       </header>
-      <div className="flex flex-col md:flex-row gap-6 mb-8">
-        <section className="flex-1 bg-white p-6 rounded-xl shadow-sm border border-gray-200"><h2 className="font-bold text-lg mb-3">1. Nạp từ khóa vào hệ thống</h2><form onSubmit={handleAddWord} className="flex gap-2"><input type="text" value={newWord} onChange={(event) => setNewWord(event.target.value)} placeholder="Nhập thuật ngữ..." className="flex-1 border-2 p-2.5 rounded-lg outline-none focus:border-blue-500" /><button type="submit" className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold">Thêm</button></form><div className="mt-3 text-sm bg-blue-50 p-3 rounded-lg border border-blue-100">Kho đang có: <strong>{wordList.length}</strong> từ</div></section>
-        <section className="md:w-1/3 bg-white p-6 rounded-xl shadow-sm border border-gray-200 flex flex-col gap-2 justify-center"><h2 className="font-bold text-lg mb-1">2. Điều khiển ván game</h2><div className={`text-sm px-3 py-2 rounded-lg border ${players.length > 0 && players.every((player) => player.ready) ? 'bg-green-50 border-green-200 text-green-700' : 'bg-amber-50 border-amber-200 text-amber-700'}`}><strong>{players.filter((player) => player.ready).length}/{players.length}</strong> người chơi đã sẵn sàng</div><div className="flex gap-2"><button onClick={startGame} disabled={gameStatus !== 'waiting'} className="flex-1 bg-green-500 disabled:bg-gray-300 text-white py-2 rounded-lg font-bold">Bắt đầu</button><button onClick={() => set(ref(db, 'gameState/status'), 'ended')} disabled={gameStatus !== 'playing'} className="flex-1 bg-red-500 disabled:bg-gray-300 text-white py-2 rounded-lg font-bold">Kết thúc</button></div><button onClick={resetMatch} className="bg-amber-500 text-white py-2 rounded-lg font-bold">Reset ván mới</button><button onClick={() => window.confirm('Xóa trắng toàn bộ kho từ khóa?') && update(ref(db, 'gameState'), { wordList: null, activeWords: null })} className="bg-gray-800 text-white py-1.5 rounded-lg font-bold text-sm mt-2">Xóa kho từ khóa</button><button onClick={() => window.confirm('Xóa sạch toàn bộ lịch sử chat?') && set(ref(db, 'chat/messages'), null)} className="bg-red-600 text-white py-1.5 rounded-lg font-bold text-sm mt-1">Xóa chat</button></section>
-      </div>
-      <section className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"><h2 className="text-xl font-bold mb-4">3. Bảng phát lệnh</h2><div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">{wordList.map((word) => { const unlocked = activeWords.includes(word); return <button key={word} onClick={() => unlockWord(word)} className={`p-3 rounded-lg font-semibold text-sm border-2 min-h-[60px] ${unlocked ? 'bg-green-500 text-white border-green-600' : 'bg-white hover:bg-blue-50'}`}>{word}</button>; })}</div></section>
+
+      <main className="admin-shell">
+        <div className="admin-page-heading">
+          <div>
+            <p className="admin-eyebrow">BẢNG ĐIỀU KHIỂN</p>
+            <h1>Quản lí ván Bingo</h1>
+            <p>
+              Chuẩn bị từ khóa, theo dõi người chơi và công bố
+              nội dung.
+            </p>
+          </div>
+
+          <span
+            className={`admin-status admin-status-${gameStatus}`}
+          >
+            <i aria-hidden="true" />
+            {statusLabel}
+          </span>
+        </div>
+
+        <section
+          className="admin-stats"
+          aria-label="Tổng quan phòng chơi"
+        >
+          <article className="admin-stat stat-burgundy">
+            <span>Kho từ khóa</span>
+            <strong>{wordList.length}</strong>
+            <small>Từ khóa trong hệ thống</small>
+          </article>
+
+          <article className="admin-stat stat-gold">
+            <span>Người chơi</span>
+            <strong>{players.length}</strong>
+            <small>Đang có trong phòng</small>
+          </article>
+
+          <article className="admin-stat stat-green">
+            <span>Đã sẵn sàng</span>
+            <strong>
+              {readyCount}
+              <em>/{players.length}</em>
+            </strong>
+            <small>Người chơi đã xác nhận</small>
+          </article>
+
+          <article className="admin-stat stat-burgundy">
+            <span>Đã công bố</span>
+            <strong>{activeWords.length}</strong>
+            <small>
+              {pendingCount} từ khóa chưa công bố
+            </small>
+          </article>
+        </section>
+
+        <div className="admin-workspace">
+          <div className="admin-main-column">
+            <section className="admin-panel">
+              <div className="admin-panel-heading">
+                <span className="admin-section-number">01</span>
+                <div>
+                  <h2>Chuẩn bị từ khóa</h2>
+                  <p>
+                    Thêm thuật ngữ vào kho dùng chung cho phòng
+                    chơi.
+                  </p>
+                </div>
+              </div>
+
+              <form
+                className="admin-add-form"
+                onSubmit={handleAddWord}
+              >
+                <label
+                  className="admin-field-label"
+                  htmlFor="admin-new-word"
+                >
+                  Từ khóa mới
+                </label>
+
+                <div className="admin-add-row">
+                  <input
+                    id="admin-new-word"
+                    className="admin-input"
+                    type="text"
+                    value={newWord}
+                    onChange={(event) =>
+                      setNewWord(event.target.value)
+                    }
+                    placeholder="Nhập thuật ngữ…"
+                  />
+
+                  <button
+                    type="submit"
+                    className="admin-button admin-button-primary"
+                  >
+                    <span aria-hidden="true">+</span>
+                    Thêm từ khóa
+                  </button>
+                </div>
+              </form>
+
+              <p className="admin-field-hint">
+                Kho đang có <strong>{wordList.length}</strong>{' '}
+                từ khóa.
+              </p>
+            </section>
+
+            <section className="admin-panel admin-command-panel">
+              <div className="admin-panel-heading">
+                <span className="admin-section-number">03</span>
+                <div>
+                  <h2>Bảng phát lệnh</h2>
+                  <p>
+                    Chọn từ khóa để công bố cho người chơi khi
+                    ván đang diễn ra.
+                  </p>
+                </div>
+              </div>
+
+              <div className="admin-command-summary">
+                <span>
+                  <i
+                    className="admin-legend-dot"
+                    aria-hidden="true"
+                  />
+                  Đã công bố: <strong>{activeWords.length}</strong>
+                </span>
+
+                <span>
+                  Chưa công bố: <strong>{pendingCount}</strong>
+                </span>
+              </div>
+
+              <div className="admin-word-grid">
+                {wordList.map((word) => {
+                  const unlocked = activeWords.includes(word);
+
+                  return (
+                    <button
+                      type="button"
+                      key={word}
+                      onClick={() => unlockWord(word)}
+                      className={`admin-word ${
+                        unlocked ? 'is-unlocked' : ''
+                      }`}
+                    >
+                      <span className="admin-word-text">
+                        {word}
+                      </span>
+
+                      <small>
+                        {unlocked
+                          ? '✓ Đã công bố'
+                          : 'Công bố từ khóa'}
+                      </small>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {wordList.length === 0 && (
+                <div className="admin-empty">
+                  <span aria-hidden="true">＋</span>
+                  <strong>Kho từ khóa đang trống</strong>
+                  <p>
+                    Thêm từ khóa ở phần chuẩn bị để hiển thị
+                    bảng phát lệnh.
+                  </p>
+                </div>
+              )}
+            </section>
+          </div>
+
+          <aside
+            className="admin-panel admin-control-panel"
+            aria-label="Điều khiển ván chơi"
+          >
+            <div className="admin-panel-heading">
+              <span className="admin-section-number">02</span>
+              <div>
+                <h2>Điều khiển ván</h2>
+                <p>Quản lí trạng thái phòng chơi.</p>
+              </div>
+            </div>
+
+            <div
+              className={`admin-readiness ${
+                allReady ? 'is-ready' : ''
+              }`}
+            >
+              <div>
+                <span>Người chơi sẵn sàng</span>
+                <strong>
+                  {readyCount}/{players.length}
+                </strong>
+              </div>
+
+              <progress
+                value={readyCount}
+                max={Math.max(players.length, 1)}
+                aria-label="Số người chơi sẵn sàng"
+              />
+
+              <p>
+                {allReady
+                  ? 'Tất cả người chơi đã xác nhận sẵn sàng.'
+                  : players.length === 0
+                    ? 'Chưa có người chơi trong phòng.'
+                    : `${players.length - readyCount} người chơi chưa xác nhận sẵn sàng.`}
+              </p>
+            </div>
+
+            <div className="admin-match-buttons">
+              <button
+                type="button"
+                onClick={startGame}
+                disabled={gameStatus !== 'waiting'}
+                className="admin-button admin-button-start"
+              >
+                <span aria-hidden="true">▶</span>
+                Bắt đầu
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  set(ref(db, 'gameState/status'), 'ended')
+                }
+                disabled={gameStatus !== 'playing'}
+                className="admin-button admin-button-end"
+              >
+                <span aria-hidden="true">■</span>
+                Kết thúc
+              </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={resetMatch}
+              className="admin-button admin-button-reset"
+            >
+              <span aria-hidden="true">↻</span>
+              Reset ván mới
+            </button>
+
+            <p className="admin-control-note">
+              Reset xóa các từ đã công bố và bảng xếp hạng,
+              giữ lại kho từ khóa.
+            </p>
+
+            <div className="admin-data-tools">
+              <h3>Quản lí dữ liệu</h3>
+              <p>
+                Các thao tác xóa cần xác nhận trước khi
+                thực hiện.
+              </p>
+
+              <button
+                type="button"
+                onClick={() =>
+                  window.confirm('Xóa trắng toàn bộ kho từ khóa?') &&
+                  update(ref(db, 'gameState'), {
+                    wordList: null,
+                    activeWords: null,
+                  })
+                }
+                className="admin-button admin-button-delete"
+              >
+                Xóa kho từ khóa
+              </button>
+
+              <button
+                type="button"
+                onClick={() =>
+                  window.confirm('Xóa sạch toàn bộ lịch sử chat?') &&
+                  set(ref(db, 'chat/messages'), null)
+                }
+                className="admin-button admin-button-delete"
+              >
+                Xóa lịch sử chat
+              </button>
+            </div>
+          </aside>
+        </div>
+
+        <footer className="admin-footer">
+          <span>Theo dấu chân Bác</span>
+          <span>Khu vực điều hành dành cho Trọng tài</span>
+        </footer>
+      </main>
+
       <Chat playerName="Trọng Tài" />
     </div>
   );
