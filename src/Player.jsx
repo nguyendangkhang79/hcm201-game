@@ -1,3 +1,4 @@
+import { bingoWords } from './data/bingo';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -12,7 +13,7 @@ import {
 } from 'firebase/database';
 import { db } from './firebase';
 import Chat from './Chat';
-import bgImage from './assets/bg-player.jpg';
+const bgImage = '/history/palace.jpg';
 import './Player.css';
 import './GameHeader.css';
 import './PlayerAutoArrange.css';
@@ -256,7 +257,7 @@ export default function Player() {
 
   useEffect(() => {
     const unsubscribeStatus = onValue(
-      ref(db, 'gameState/status'),
+      ref(db, 'courses/vnr202/gameState/status'),
       (snapshot) => {
         const status = snapshot.val() || 'waiting';
         gameStatusRef.current = status;
@@ -271,17 +272,17 @@ export default function Player() {
     );
 
     const unsubscribeWords = onValue(
-      ref(db, 'gameState/wordList'),
+      ref(db, 'courses/vnr202/gameState/wordList'),
       (snapshot) => {
         setAllWords(
-          getUniqueWords(Object.values(snapshot.val() || {})),
+          getUniqueWords(Object.values(snapshot.val() || bingoWords)),
         );
         setWordsLoaded(true);
       },
     );
 
     const unsubscribeActiveWords = onValue(
-      ref(db, 'gameState/activeWords'),
+      ref(db, 'courses/vnr202/gameState/activeWords'),
       (snapshot) => {
         if (snapshot.exists()) {
           setUnlockedWords(Object.values(snapshot.val()));
@@ -308,7 +309,7 @@ export default function Player() {
 
     const presenceRef = ref(
       db,
-      `gameState/players/${playerSessionId.current}`,
+      `courses/vnr202/gameState/players/${playerSessionId.current}`,
     );
 
     const unsubscribeConnection = onValue(
@@ -336,7 +337,7 @@ export default function Player() {
     if (!playerName || gameBlocked) return;
 
     update(
-      ref(db, `gameState/players/${playerSessionId.current}`),
+      ref(db, `courses/vnr202/gameState/players/${playerSessionId.current}`),
       { ready: isReady },
     );
   }, [playerName, gameBlocked, isReady]);
@@ -446,14 +447,14 @@ export default function Player() {
 
     try {
       const counter = await runTransaction(
-        ref(db, 'gameState/winnerCount'),
+        ref(db, 'courses/vnr202/gameState/winnerCount'),
         (current) => (current || 0) + 1,
       );
 
       const rank = counter.snapshot.val();
 
       await set(
-        ref(db, `gameState/winners/${playerSessionId.current}`),
+        ref(db, `courses/vnr202/gameState/winners/${playerSessionId.current}`),
         {
           name: playerName,
           rank,
@@ -697,11 +698,11 @@ export default function Player() {
             </button>
 
             <div className="brand-mark">
-              <img src="/hcm-brand-mark.svg" alt="" />
+              <img src="/brand-mark.svg" alt="" />
             </div>
 
             <span className="player-brand-text">
-              <strong>BINGO HỒ CHÍ MINH</strong>
+              <strong>BINGO VNR202</strong>
               <small>HỌC TẬP QUA TRÒ CHƠI</small>
             </span>
           </div>

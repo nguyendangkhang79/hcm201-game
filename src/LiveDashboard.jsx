@@ -26,7 +26,7 @@ export default function LiveDashboard() {
 
   useEffect(() => {
     const stopPlayers = onValue(
-      ref(db, 'gameState/players'),
+      ref(db, 'courses/vnr202/gameState/players'),
       (snapshot) => {
         const list = Object.entries(snapshot.val() || {})
           .map(([id, value]) => ({ id, ...value }))
@@ -37,7 +37,7 @@ export default function LiveDashboard() {
     );
 
     const stopWinners = onValue(
-      ref(db, 'gameState/winners'),
+      ref(db, 'courses/vnr202/gameState/winners'),
       (snapshot) => {
         const list = Object.entries(snapshot.val() || {})
           .map(([id, value]) => ({ id, ...value }))
@@ -48,7 +48,7 @@ export default function LiveDashboard() {
     );
 
     const stopStatus = onValue(
-      ref(db, 'gameState/status'),
+      ref(db, 'courses/vnr202/gameState/status'),
       (snapshot) => {
         setStatus(snapshot.val() || 'waiting');
       },
@@ -72,11 +72,11 @@ export default function LiveDashboard() {
         <a
           href="/"
           className="live-brand"
-          aria-label="Bingo Hồ Chí Minh - Trang chủ"
+          aria-label="Bingo VNR202 - Trang chủ"
         >
-          <img src="/hcm-brand-mark.svg" alt="" />
+          <img src="/brand-mark.svg" alt="" />
           <span>
-            <strong>BINGO HỒ CHÍ MINH</strong>
+            <strong>BINGO VNR202</strong>
             <small>HỌC TẬP QUA TRÒ CHƠI</small>
           </span>
         </a>
@@ -237,8 +237,8 @@ export default function LiveDashboard() {
       </main>
 
       <footer className="live-footer">
-        <span>BIÊN GIỚI MỀM</span>
-        <p>Hội nhập sâu rộng · Tự chủ vững vàng</p>
+        <span>DẤU ẤN LỊCH SỬ ĐẢNG</span>
+        <p>VNR202 · Kết nối sự kiện, ghi nhớ lịch sử</p>
         <span>{new Date().getFullYear()}</span>
       </footer>
     </div>

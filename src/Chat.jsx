@@ -15,7 +15,7 @@ export default function Chat({ playerName, autoOpenOnce = false }) {
 
   // Lắng nghe real-time từ Firebase
   useEffect(() => {
-    const messagesRef = ref(db, 'chat/messages');
+    const messagesRef = ref(db, 'courses/vnr202/chat/messages');
     const unsubscribe = onValue(messagesRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -82,7 +82,7 @@ export default function Chat({ playerName, autoOpenOnce = false }) {
     const trimmed = input.trim();
     if (!trimmed) return;
 
-    push(ref(db, 'chat/messages'), {
+    push(ref(db, 'courses/vnr202/chat/messages'), {
       name: playerName || 'Ẩn danh',
       text: trimmed,
       timestamp: Date.now(),

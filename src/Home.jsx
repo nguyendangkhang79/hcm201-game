@@ -1,666 +1,135 @@
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import heroImage from './assets/hero-ho-chi-minh.webp';
-import './Home.css';
-import './HomeTours.css';
-
-const TOURS = [
-  {
-    id: 'kim-lien',
-    title: 'Làng Sen – Kim Liên',
-    location: 'Nghệ An',
-    description:
-      'Khám phá quê hương Chủ tịch Hồ Chí Minh qua các không gian Làng Sen và Hoàng Trù.',
-    url: 'https://langsenkimlien.hochiminh.vn/',
-    image:
-      'https://langsenkimlien.hochiminh.vn/KimLiendata/pano/thumb/thumb_03.jpg',
-  },
-  {
-    id: 'chau-van-liem',
-    title: 'Nhà số 5 Châu Văn Liêm',
-    location: 'Thành phố Hồ Chí Minh',
-    description:
-      'Tìm hiểu nơi Nguyễn Tất Thành từng ở trước khi ra đi tìm đường cứu nước.',
-    url: 'https://so5chauvanliem.hochiminh.vn/',
-    image:
-      'https://so5chauvanliem.hochiminh.vn/So5CVLdata/pano/thumb/thumb_01.jpg',
-  },
-  {
-    id: 'ben-nha-rong',
-    title: 'Bến Nhà Rồng',
-    location: 'Thành phố Hồ Chí Minh',
-    description:
-      'Tham quan Bến Nhà Rồng và các không gian trưng bày của Bảo tàng Hồ Chí Minh.',
-    url: 'https://bennharong.hochiminh.vn/',
-    image:
-      'https://bennharong.hochiminh.vn/BenNhaRongdata/pano/thumb/thumb_01.jpg',
-  },
-  {
-    id: 'hang-ngang',
-    title: 'Nhà số 48 Hàng Ngang',
-    location: 'Hà Nội',
-    description:
-      'Khám phá nơi Chủ tịch Hồ Chí Minh viết Tuyên ngôn Độc lập.',
-    url: 'https://48hangngang.hochiminh.vn/',
-    image:
-      'https://48hangngang.hochiminh.vn/48HangNgangdata/pano/thumb/thumb_01.jpg',
-  },
-  {
-    id: 'van-phuc',
-    title: 'Nhà lưu niệm tại Vạn Phúc',
-    location: 'Hà Nội',
-    description:
-      'Tìm hiểu nơi Chủ tịch Hồ Chí Minh viết Lời kêu gọi toàn quốc kháng chiến.',
-    url: 'https://vanphuc.hochiminh.vn/',
-    image:
-      'https://vanphuc.hochiminh.vn/VanPhucdata/pano/thumb/thumb_03.jpg',
-  },
-  {
-    id: 'phu-chu-tich',
-    title: 'Khu di tích tại Phủ Chủ tịch',
-    location: 'Hà Nội',
-    description:
-      'Khám phá không gian gắn với đời sống và công việc của Chủ tịch Hồ Chí Minh.',
-    url: 'http://phuchutich.egal.vn/',
-    image:
-      'https://nhasanbacho.vn/wp-content/uploads/2023/08/080814181932.png',
-  },
-];
-
-const HELP_STEPS = [
-  [
-    'Tham gia phòng',
-    'Nhập tên của bạn và chọn “Vào phòng chơi”.',
-  ],
-  [
-    'Tạo thẻ Bingo',
-    'Kéo thả hoặc chọn từ khóa để điền đủ 25 ô trên bảng 5 × 5.',
-  ],
-  [
-    'Xác nhận sẵn sàng',
-    'Kiểm tra thẻ, xác nhận sẵn sàng và chờ Trọng tài bắt đầu.',
-  ],
-  [
-    'Đánh dấu từ khóa',
-    'Khi ván bắt đầu, chỉ đánh dấu ô có từ khóa đã được Trọng tài công bố.',
-  ],
-  [
-    'Hoàn thành Bingo',
-    'Đủ 5 ô được đánh dấu theo hàng ngang, dọc hoặc chéo, hệ thống tự ghi nhận Bingo và lưu kết quả.',
-  ],
-];
-
-function Icon({ name }) {
-  const paths = {
-    arrow: <path d="M5 12h14m-6-6 6 6-6 6" />,
-    external: (
-      <>
-        <path d="M14 3h7v7M21 3 10 14" />
-        <path d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5" />
-      </>
-    ),
-    user: (
-      <>
-        <circle cx="12" cy="7" r="4" />
-        <path d="M4 21a8 8 0 0 1 16 0" />
-      </>
-    ),
-    pin: (
-      <>
-        <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" />
-        <circle cx="12" cy="10" r="2.5" />
-      </>
-    ),
-    building: (
-      <>
-        <path d="m3 9 9-6 9 6H3ZM5 10v9m5-9v9m4-9v9m5-9v9M3 21h18" />
-      </>
-    ),
-    close: <path d="m6 6 12 12M6 18 18 6" />,
-  };
-
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      {paths[name]}
-    </svg>
-  );
-}
-
-function TourCard({ tour, index }) {
-  const [imageFailed, setImageFailed] = useState(false);
-
-  return (
-    <article className="tour-card">
-      <a
-        className="tour-cover"
-        href={tour.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`Tham quan ${tour.title}, mở trong tab mới`}
-      >
-        {tour.image && !imageFailed ? (
-          <img
-            src={tour.image}
-            alt={`Không gian tham quan ${tour.title}`}
-            loading="lazy"
-            decoding="async"
-            referrerPolicy="no-referrer"
-            onError={() => setImageFailed(true)}
-          />
-        ) : (
-          <div className="tour-cover-fallback">
-            <Icon name="building" />
-            <span>{tour.title}</span>
-          </div>
-        )}
-
-        <span className="tour-tag">THAM QUAN 3D</span>
-
-        <span className="tour-number">
-          {String(index + 1).padStart(2, '0')}
-        </span>
-      </a>
-
-      <div className="tour-body">
-        <p className="tour-location">
-          <Icon name="pin" />
-          {tour.location}
-        </p>
-
-        <h3>{tour.title}</h3>
-
-        <p className="tour-description">{tour.description}</p>
-
-        <a
-          className="tour-link"
-          href={tour.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={`Khám phá 3D ${tour.title}, mở trong tab mới`}
-        >
-          Mở tham quan 3D
-          <Icon name="external" />
-        </a>
-      </div>
-    </article>
-  );
-}
+import { Link } from "react-router-dom";
+import Layout from "./Layout";
+import { locations, timeline } from "./data/history";
+import LocationCard from "./LocationCard";
 
 export default function Home() {
-  const [playerName, setPlayerName] = useState('');
-  const [dialog, setDialog] = useState(null);
-
-  const dialogRef = useRef(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!dialog) {
-      return undefined;
-    }
-
-    const element = dialogRef.current;
-    const previousFocus = document.activeElement;
-    const previousOverflow = document.body.style.overflow;
-
-    element.showModal();
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      element.close();
-      document.body.style.overflow = previousOverflow;
-
-      if (
-        previousFocus instanceof HTMLElement &&
-        previousFocus.isConnected
-      ) {
-        previousFocus.focus();
-      }
-    };
-  }, [dialog]);
-
-  const handleJoinRoom = (event) => {
-    event.preventDefault();
-
-    const name = playerName.trim();
-
-    if (name) {
-      navigate('/play', {
-        state: { playerName: name },
-      });
-    }
-  };
-
   return (
-    <div id="dau-trang" className="light-home tours-home">
-      <header className="home-header">
-        <a
-          className="home-brand"
-          href="/"
-          aria-label="Theo dấu chân Bác - Trang chủ"
-        >
-          <span className="home-brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 56 56">
-              <circle cx="28" cy="28" r="24" />
-              <circle cx="28" cy="28" r="20" />
-              <path d="m28 13 4.4 9 9.9 1.4-7.2 7 1.7 9.9-8.8-4.7-8.8 4.7 1.7-9.9-7.2-7 9.9-1.4Z" />
-            </svg>
-          </span>
-
-          <span>
-            <strong>THEO DẤU CHÂN BÁC</strong>
-            <small>
-              KHÁM PHÁ DI TÍCH · TÌM HIỂU TƯ TƯỞNG
-            </small>
-          </span>
-        </a>
-
-        <nav className="home-nav" aria-label="Điều hướng chính">
-          <button
-            type="button"
-            onClick={() => setDialog('intro')}
-          >
-            Giới thiệu
-          </button>
-
-          <a href="#di-tich-3d">Di tích 3D</a>
-
-          <a
-            className="home-nav-play"
-            href="#tham-gia-bingo"
-          >
-            Chơi Bingo
-            <Icon name="arrow" />
-          </a>
-        </nav>
-      </header>
-
-      <main>
-        <div className="home-main">
-          <section
-            className="home-copy"
-            aria-labelledby="home-title"
-          >
-            <p className="topic-label">
-              <span aria-hidden="true" />
-              KHÁM PHÁ LỊCH SỬ · KẾT NỐI KIẾN THỨC
-            </p>
-
-            <h1 id="home-title">
-              <span>Quá trình hình thành</span>
-              <span>tư tưởng</span>
-              <em>Hồ Chí Minh</em>
-            </h1>
-
-            <p className="home-lead">
-              Theo dấu chân Người qua những địa danh lịch sử
-              bằng trải nghiệm tham quan 3D. Tìm hiểu cuộc đời,
-              sự nghiệp và cùng ôn tập chủ đề qua trò chơi Bingo.
-            </p>
-
-            <div className="tour-hero-actions">
-              <a className="tour-primary" href="#di-tich-3d">
-                Khám phá di tích 3D
-                <Icon name="arrow" />
-              </a>
-
-              <a
-                className="tour-secondary"
-                href="#tham-gia-bingo"
-              >
-                Tham gia Bingo
-              </a>
+    <Layout>
+      <section className="history-hero page-width">
+        <div className="hero-copy">
+          <p className="eyebrow">
+            CHỦ ĐỀ 05 <span /> VIỆT NAM 1975–1986
+          </p>
+          <h1>
+            Từ thống nhất
+            <br />
+            đến bước ngoặt
+            <br />
+            <em>Đổi mới.</em>
+          </h1>
+          <p className="hero-lead">
+            Một hành trình nhìn lại những lựa chọn làm nên lịch sử. Khám phá địa
+            điểm, kết nối sự kiện và ghi nhớ bằng trải nghiệm.
+          </p>
+          <div className="actions">
+            <Link className="button" to="/explore">
+              Bắt đầu khám phá <span>↗</span>
+            </Link>
+            <Link className="text-link" to="/quiz">
+              Thử sức với Quiz →
+            </Link>
+          </div>
+          <div className="hero-footnote">
+            <span>01 / KHÁM PHÁ</span>
+            <span>02 / KẾT NỐI</span>
+            <span>03 / GHI NHỚ</span>
+          </div>
+        </div>
+        <figure className="hero-photo">
+          <img
+            src="/history/palace.jpg"
+            alt="Xe tăng trưng bày trong khuôn viên Dinh Độc Lập, ảnh chụp năm 2013"
+            fetchPriority="high"
+          />
+          <div className="hero-date">
+            1975<span>Khởi đầu một chương mới</span>
+          </div>
+          <figcaption>
+            <span>DINH ĐỘC LẬP · TP. HỒ CHÍ MINH</span>
+            <a href={locations[0].credit.url} target="_blank" rel="noreferrer">
+              Ảnh chụp năm 2013: Clay Gilliland · CC BY-SA 2.0 ↗
+            </a>
+          </figcaption>
+        </figure>
+      </section>
+      <section className="timeline-section">
+        <div className="page-width">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">DÒNG CHẢY LỊCH SỬ</p>
+              <h2>Mười một năm. Những bước ngoặt.</h2>
             </div>
-
-            <div
-              className="home-features"
-              aria-label="Thông tin trải nghiệm"
-            >
-              <div>
-                <strong>06</strong>
-                <span>Địa danh lịch sử</span>
-              </div>
-
-              <div>
-                <strong>3D</strong>
-                <span>Tham quan trực tuyến</span>
-              </div>
-
-              <div>
-                <strong>5 × 5</strong>
-                <span>Thử thách Bingo</span>
-              </div>
-            </div>
-          </section>
-
-          <figure className="topic-visual-column">
-            <div className="topic-image-stage">
-              <div className="topic-image-frame">
-                <img
-                  className="topic-hero-image"
-                  src={heroImage}
-                  alt="Chân dung Chủ tịch Hồ Chí Minh trên nền minh họa lịch sử"
-                  width={1080}
-                  height={1080}
-                  fetchPriority="high"
-                  decoding="async"
-                />
-              </div>
-            </div>
-
-            <figcaption className="topic-caption">
-              Khám phá · Ghi nhớ · Kết nối
-            </figcaption>
-          </figure>
-
-          <ol
-            className="topic-steps"
-            aria-label="Hành trình trải nghiệm"
-          >
-            <li className="topic-step">
-              <strong>01</strong>
-              <span>Khám phá di tích 3D</span>
-            </li>
-
-            <li className="topic-step">
-              <strong>02</strong>
-              <span>Tìm hiểu và ghi nhớ</span>
-            </li>
-
-            <li className="topic-step">
-              <strong>03</strong>
-              <span>Tham gia Bingo</span>
-            </li>
+            <span className="section-aside">1975 — 1986</span>
+          </div>
+          <ol className="history-timeline">
+            {timeline.map((item) => (
+              <li key={item.year}>
+                <a href={item.source.url} target="_blank" rel="noreferrer">
+                  <strong>{item.year}</strong>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                  <span>Đọc tư liệu ↗</span>
+                </a>
+              </li>
+            ))}
           </ol>
         </div>
-
-        <section
-          id="di-tich-3d"
-          className="tour-section"
-          aria-labelledby="tours-title"
-        >
-          <div className="tour-section-heading">
-            <div>
-              <p className="topic-label">
-                <span aria-hidden="true" />
-                KHÔNG GIAN THAM QUAN TRỰC TUYẾN
-              </p>
-
-              <h2 id="tours-title">
-                Hành trình qua những di tích
-              </h2>
-            </div>
-
-            <p>
-              Khám phá những địa danh gắn với cuộc đời và sự
-              nghiệp Chủ tịch Hồ Chí Minh, để hiểu thêm bối cảnh
-              của chủ đề học tập.
-            </p>
+      </section>
+      <section className="page-width section-space">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">NHỮNG ĐỊA ĐIỂM KỂ CHUYỆN</p>
+            <h2>Lịch sử có một tọa độ.</h2>
           </div>
-
-          <div className="tour-grid">
-            {TOURS.map((tour, index) => (
-              <TourCard
-                key={tour.id}
-                tour={tour}
-                index={index}
-              />
-            ))}
-          </div>
-
-          <p className="tour-note">
-            <Icon name="external" />
-            Các trải nghiệm tham quan mở trong tab mới.
-            Quay lại trang này để tiếp tục chơi Bingo.
+          <Link className="text-link" to="/explore">
+            Xem tất cả địa điểm →
+          </Link>
+        </div>
+        <div className="location-grid home-locations">
+          {locations.slice(0, 2).map((site, index) => (
+            <LocationCard key={site.id} site={site} index={index} />
+          ))}
+        </div>
+      </section>
+      <section className="learning-section page-width">
+        <div>
+          <p className="eyebrow">TỪ KHÁM PHÁ ĐẾN GHI NHỚ</p>
+          <h2>
+            Bạn nhớ được
+            <br />
+            <em>bao nhiêu dấu mốc?</em>
+          </h2>
+          <p>
+            Kiểm tra kiến thức của riêng mình hoặc cùng cả lớp kết nối những từ
+            khóa lịch sử.
           </p>
-        </section>
-
-        <section
-          id="tham-gia-bingo"
-          className="bingo-section"
-          aria-labelledby="bingo-title"
-        >
-          <div className="bingo-intro">
-            <p className="topic-label">
-              <span aria-hidden="true" />
-              CÙNG CỦNG CỐ KIẾN THỨC
-            </p>
-
-            <h2 id="bingo-title">
-              Từ trải nghiệm
-              <br />
-              <em>đến kiến thức</em>
-            </h2>
-
-            <p>
-              Ôn lại chủ đề học tập qua bảng Bingo 5 × 5.
-              Nhập tên để vào phòng, sau đó làm theo ba bước
-              bên dưới.
-            </p>
-
-            <div
-              className="bingo-quick-guide"
-              aria-labelledby="quick-guide-title"
-            >
-              <h3 id="quick-guide-title">Cách chơi Bingo</h3>
-
-              <ol>
-                <li>
-                  <span>01</span>
-                  <div>
-                    <strong>Xếp đủ 25 ô</strong>
-                    <p>
-                      Kéo thả từ khóa hoặc dùng chế độ
-                      “Chọn &amp; chạm”.
-                    </p>
-                  </div>
-                </li>
-
-                <li>
-                  <span>02</span>
-                  <div>
-                    <strong>Xác nhận sẵn sàng</strong>
-                    <p>
-                      Hoàn tất bảng và chờ Trọng tài bắt đầu ván.
-                    </p>
-                  </div>
-                </li>
-
-                <li>
-                  <span>03</span>
-                  <div>
-                    <strong>Đánh dấu và hoàn thành Bingo</strong>
-                    <p>
-                      Chọn từ đã được công bố. Đủ 5 ô ngang,
-                      dọc hoặc chéo sẽ được ghi nhận tự động.
-                    </p>
-                  </div>
-                </li>
-              </ol>
-            </div>
-
-            <button
-              className="bingo-help"
-              type="button"
-              onClick={() => setDialog('help')}
-            >
-              Xem hướng dẫn chi tiết
-              <Icon name="arrow" />
-            </button>
-          </div>
-
-          <form className="join-card" onSubmit={handleJoinRoom}>
-            <div className="bingo-form-header">
-              <span className="bingo-form-mark" aria-hidden="true">
-                ★
-              </span>
-
-              <div>
-                <p className="bingo-form-kicker">
-                  HỌC TẬP QUA TRÒ CHƠI
-                </p>
-                <h3>Tham gia phòng Bingo</h3>
-              </div>
-            </div>
-
-            <p className="bingo-form-description">
-              Nhập tên của bạn để bắt đầu xếp thẻ.
-            </p>
-
-            <label htmlFor="player-name">Tên người chơi</label>
-
-            <div className="join-row">
-              <div className="home-input-wrap">
-                <Icon name="user" />
-
-                <input
-                  id="player-name"
-                  type="text"
-                  value={playerName}
-                  onChange={(event) =>
-                    setPlayerName(event.target.value)
-                  }
-                  placeholder="Nhập tên của bạn"
-                  maxLength={30}
-                  autoComplete="name"
-                  aria-describedby="join-name-hint"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="join-button"
-                disabled={!playerName.trim()}
-              >
-                Vào phòng chơi
-                <Icon name="arrow" />
-              </button>
-            </div>
-
-            <p id="join-name-hint" className="join-name-hint">
-              {playerName.trim()
-                ? 'Tên đã sẵn sàng. Bạn có thể vào phòng chơi.'
-                : 'Nhập tên để bật nút vào phòng.'}
-            </p>
-
-            <p>
-              <span className="online-dot" aria-hidden="true" />
-              Không cần tài khoản · Tham gia cùng lớp
-            </p>
-          </form>
-        </section>
-      </main>
-
-      <footer className="home-footer">
-        <span>Theo dấu chân Bác</span>
-        <span>Học tập qua trải nghiệm</span>
-        <a href="#dau-trang">Về đầu trang ↑</a>
-      </footer>
-
-      {dialog && (
-        <dialog
-          ref={dialogRef}
-          className="help-modal"
-          aria-labelledby="help-title"
-          onCancel={() => setDialog(null)}
-          onClick={(event) => {
-            if (event.target !== event.currentTarget) {
-              return;
-            }
-
-            const bounds =
-              event.currentTarget.getBoundingClientRect();
-
-            if (
-              event.clientX < bounds.left ||
-              event.clientX > bounds.right ||
-              event.clientY < bounds.top ||
-              event.clientY > bounds.bottom
-            ) {
-              setDialog(null);
-            }
-          }}
-        >
-          <div className="help-header">
-            <div>
-              <p className="topic-label">
-                <span aria-hidden="true" />
-                {dialog === 'intro'
-                  ? 'CHỦ ĐỀ HỌC TẬP'
-                  : 'HƯỚNG DẪN'}
-              </p>
-
-              <h2 id="help-title">
-                {dialog === 'intro'
-                  ? 'Theo dấu chân Bác'
-                  : 'Cách chơi Bingo'}
-              </h2>
-            </div>
-
-            <button
-              type="button"
-              className="modal-close"
-              onClick={() => setDialog(null)}
-              aria-label="Đóng hộp thoại"
-            >
-              <Icon name="close" />
-            </button>
-          </div>
-
-          {dialog === 'intro' ? (
-            <div className="intro-copy">
-              <h3>Khám phá lịch sử, kết nối kiến thức</h3>
-
-              <p>
-                Website kết hợp giới thiệu các trải nghiệm tham
-                quan di tích 3D với trò chơi Bingo về quá trình
-                hình thành tư tưởng Hồ Chí Minh.
-              </p>
-
-              <p>
-                Các di tích cung cấp thêm bối cảnh về cuộc đời
-                và sự nghiệp của Người. Nội dung ôn tập trong
-                game do người điều khiển buổi học chuẩn bị
-                và công bố.
-              </p>
-            </div>
-          ) : (
-            <div>
-              <ol className="help-steps">
-                {HELP_STEPS.map(
-                  ([title, description], index) => (
-                    <li key={title}>
-                      <span>
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-
-                      <div>
-                        <strong>{title}</strong>
-                        <p>{description}</p>
-                      </div>
-                    </li>
-                  ),
-                )}
-              </ol>
-
-              <p className="help-game-note">
-                Hãy vào phòng trước khi ván bắt đầu.
-                Sau khi xác nhận sẵn sàng, bảng sẽ được khóa
-                để chơi.
-              </p>
-            </div>
-          )}
-
-          <button
-            type="button"
-            className="help-confirm"
-            onClick={() => setDialog(null)}
-          >
-            Đã hiểu
-            <Icon name="arrow" />
-          </button>
-        </dialog>
-      )}
-    </div>
+        </div>
+        <Link className="activity-card" to="/quiz">
+          <span className="activity-symbol">?</span>
+          <small>01 / TỰ HỌC</small>
+          <h3>
+            Quiz lịch sử <span>↗</span>
+          </h3>
+          <p>
+            36 câu hỏi · 6 chủ đề
+            <br />
+            Tự luyện hoặc thử thách tính giờ
+          </p>
+        </Link>
+        <Link className="activity-card bingo-activity" to="/bingo">
+          <span className="activity-symbol">▦</span>
+          <small>02 / CÙNG LỚP</small>
+          <h3>
+            Bingo 5 × 5 <span>↗</span>
+          </h3>
+          <p>
+            Xếp thẻ · Kết nối từ khóa
+            <br />
+            Cùng trọng tài chinh phục bảng Bingo
+          </p>
+        </Link>
+      </section>
+    </Layout>
   );
 }

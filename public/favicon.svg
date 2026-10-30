@@ -1,18 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <defs>
-    <linearGradient id="r" x1="12" y1="6" x2="53" y2="59" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#C82E36"/>
-      <stop offset="1" stop-color="#7F151B"/>
-    </linearGradient>
-    <linearGradient id="g" x1="25" y1="20" x2="39" y2="43" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFE99C"/>
-      <stop offset="1" stop-color="#D2A238"/>
-    </linearGradient>
-  </defs>
-  <path d="M32 3C43.5 3 53.5 7.9 60 15.5v23C60 51 48.8 57.5 32 61 15.2 57.5 4 51 4 38.5v-23C10.5 7.9 20.5 3 32 3Z" fill="url(#r)"/>
-  <path d="M32 7C42 7 50.4 11 56 17v20.7C56 47.3 47.4 53 32 56.6 16.6 53 8 47.3 8 37.7V17C13.6 11 22 7 32 7Z" fill="none" stroke="#F2D170" stroke-width="2" opacity=".55"/>
-  <ellipse cx="32" cy="30" rx="18" ry="12" fill="none" stroke="#FFF0BB" stroke-width="1.5" opacity=".6"/>
-  <ellipse cx="32" cy="30" rx="7.5" ry="18" fill="none" stroke="#FFF0BB" stroke-width="1.5" opacity=".42"/>
-  <path d="M14 30h36" stroke="#FFF0BB" stroke-width="1.5" opacity=".35"/>
-  <path d="m32 16 3.3 6.8 7.5 1.1-5.4 5.3 1.3 7.5-6.7-3.5-6.7 3.5 1.3-7.5-5.4-5.3 7.5-1.1L32 16Z" fill="url(#g)"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 54"><rect x="1" y="1" width="46" height="52" rx="3" fill="#9E1B24"/><path d="M11 13h11c3 0 5 2 5 4v24c-2-3-4-4-7-4h-9V13Zm26 0H26v28c2-3 4-4 7-4h4V13Z" fill="none" stroke="#D6AC55" stroke-width="1.5"/><path d="M15 21h5m-5 6h5m10-6h3m-3 6h3" stroke="#D6AC55"/></svg>

@@ -1,5 +1,6 @@
+import { bingoWords } from './data/bingo';
 import { useEffect, useState } from 'react';
-import { onValue, push, ref, set, update } from 'firebase/database';
+import { onValue, push, ref, runTransaction, set, update } from 'firebase/database';
 import { db } from './firebase';
 import Chat from './Chat';
 import './Admin.css';
@@ -18,25 +19,27 @@ export default function Admin() {
   useEffect(() => {
     if (!isAuthenticated) return undefined;
 
+    runTransaction(ref(db, 'courses/vnr202/gameState/wordList'), current => current === null ? bingoWords : undefined).catch(() => alert('Không thể khởi tạo từ khóa VNR202. Kiểm tra kết nối Firebase.'));
+
     const unsubscribeWords = onValue(
-      ref(db, 'gameState/wordList'),
+      ref(db, 'courses/vnr202/gameState/wordList'),
       (snapshot) =>
-        setWordList(Object.values(snapshot.val() || {})),
+        setWordList(Object.values(snapshot.val() || bingoWords)),
     );
 
     const unsubscribeActive = onValue(
-      ref(db, 'gameState/activeWords'),
+      ref(db, 'courses/vnr202/gameState/activeWords'),
       (snapshot) =>
         setActiveWords(Object.values(snapshot.val() || {})),
     );
 
     const unsubscribeStatus = onValue(
-      ref(db, 'gameState/status'),
+      ref(db, 'courses/vnr202/gameState/status'),
       (snapshot) => setGameStatus(snapshot.val() || 'waiting'),
     );
 
     const unsubscribePlayers = onValue(
-      ref(db, 'gameState/players'),
+      ref(db, 'courses/vnr202/gameState/players'),
       (snapshot) =>
         setPlayers(Object.values(snapshot.val() || {})),
     );
@@ -72,7 +75,7 @@ export default function Admin() {
       return;
     }
 
-    push(ref(db, 'gameState/wordList'), word).catch(() =>
+    push(ref(db, 'courses/vnr202/gameState/wordList'), word).catch(() =>
       alert(
         'Không thêm được từ khóa! Kiểm tra kết nối hoặc quyền Firebase.',
       ),
@@ -88,7 +91,7 @@ export default function Admin() {
     }
 
     if (!activeWords.includes(word)) {
-      push(ref(db, 'gameState/activeWords'), word);
+      push(ref(db, 'courses/vnr202/gameState/activeWords'), word);
     }
   };
 
@@ -108,7 +111,7 @@ export default function Admin() {
       return;
     }
 
-    set(ref(db, 'gameState/status'), 'playing');
+    set(ref(db, 'courses/vnr202/gameState/status'), 'playing');
   };
 
   const resetMatch = () => {
@@ -117,7 +120,7 @@ export default function Admin() {
         'Bắt đầu ván mới? Toàn bộ dấu Bingo và bảng xếp hạng hiện tại sẽ bị xóa.',
       )
     ) {
-      update(ref(db, 'gameState'), {
+      update(ref(db, 'courses/vnr202/gameState'), {
         activeWords: null,
         status: 'waiting',
         winners: null,
@@ -150,7 +153,7 @@ export default function Admin() {
         <main className="admin-login-card">
           <div className="admin-login-brand">
             <span aria-hidden="true">★</span>
-            THEO DẤU CHÂN BÁC
+            DẤU ẤN LỊCH SỬ ĐẢNG
           </div>
 
           <p className="admin-eyebrow">KHU VỰC QUẢN LÍ</p>
@@ -201,7 +204,7 @@ export default function Admin() {
           <a
             className="admin-brand"
             href="/"
-            aria-label="Theo dấu chân Bác - Trang chủ"
+            aria-label="Dấu ấn lịch sử Đảng - Trang chủ"
           >
             <span
               className="admin-brand-mark"
@@ -211,7 +214,7 @@ export default function Admin() {
             </span>
 
             <span>
-              <strong>THEO DẤU CHÂN BÁC</strong>
+              <strong>DẤU ẤN LỊCH SỬ ĐẢNG</strong>
               <small>QUẢN LÍ PHÒNG BINGO</small>
             </span>
           </a>
@@ -453,7 +456,7 @@ export default function Admin() {
               <button
                 type="button"
                 onClick={() =>
-                  set(ref(db, 'gameState/status'), 'ended')
+                  set(ref(db, 'courses/vnr202/gameState/status'), 'ended')
                 }
                 disabled={gameStatus !== 'playing'}
                 className="admin-button admin-button-end"
@@ -488,7 +491,7 @@ export default function Admin() {
                 type="button"
                 onClick={() =>
                   window.confirm('Xóa trắng toàn bộ kho từ khóa?') &&
-                  update(ref(db, 'gameState'), {
+                  update(ref(db, 'courses/vnr202/gameState'), {
                     wordList: null,
                     activeWords: null,
                   })
@@ -502,7 +505,7 @@ export default function Admin() {
                 type="button"
                 onClick={() =>
                   window.confirm('Xóa sạch toàn bộ lịch sử chat?') &&
-                  set(ref(db, 'chat/messages'), null)
+                  set(ref(db, 'courses/vnr202/chat/messages'), null)
                 }
                 className="admin-button admin-button-delete"
               >
@@ -513,7 +516,7 @@ export default function Admin() {
         </div>
 
         <footer className="admin-footer">
-          <span>Theo dấu chân Bác</span>
+          <span>Dấu ấn lịch sử Đảng</span>
           <span>Khu vực điều hành dành cho Trọng tài</span>
         </footer>
       </main>
