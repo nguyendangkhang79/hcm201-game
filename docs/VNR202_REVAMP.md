@@ -2,6 +2,8 @@
 
 Ngày: 30/10/2026. Phạm vi: cập nhật checkout hiện tại, giữ React/Vite/Firebase/Vercel.
 
+> Đây là bản phân tích tại thời điểm revamp ban đầu. Quiz đã được nâng cấp lên API máy chủ, 60 câu và lưu/khôi phục bài; thông tin mới nhất nằm tại [QUIZ_SECURITY.md](QUIZ_SECURITY.md) và README. Các mốc 36 câu, chấm điểm client và chưa có xuất kết quả bên dưới mô tả phiên bản cũ.
+
 ## 1. Kết quả phân tích project cũ
 
 | Thành phần | Hiện trạng trước cập nhật | Quyết định |

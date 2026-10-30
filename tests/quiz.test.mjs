@@ -1,12 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { questions, topics } from "../src/data/quiz.js";
+import { questions, topics } from "../server/questionBank.js";
 import { bingoWords } from "../src/data/bingo.js";
 import { createRound, scoreRound } from "../src/quizEngine.js";
 
-test("bank has 36 complete questions across six topics, valid answers and sources", () => {
-  assert.equal(questions.length, 36);
-  assert.equal(new Set(questions.map((q) => q.id)).size, 36);
+test("bank has 60 complete questions across six topics, valid answers and sources", () => {
+  assert.equal(questions.length, 60);
+  assert.equal(new Set(questions.map((q) => q.id)).size, 60);
   for (const q of questions) {
     assert.ok(topics.some((t) => t.id === q.topic));
     assert.equal(q.options.length, 4);
@@ -16,7 +16,7 @@ test("bank has 36 complete questions across six topics, valid answers and source
     assert.equal(new URL(q.source.url).protocol, "https:");
   }
   for (const topic of topics)
-    assert.equal(questions.filter((q) => q.topic === topic.id).length, 6);
+    assert.equal(questions.filter((q) => q.topic === topic.id).length, 10);
 });
 
 test("round selection respects topics and size without duplicates or mutating bank", () => {
@@ -29,7 +29,7 @@ test("round selection respects topics and size without duplicates or mutating ba
     questions.map((q) => q.id),
     original,
   );
-  assert.equal(createRound(questions, ["unity"], 15).length, 6);
+  assert.equal(createRound(questions, ["unity"], 15).length, 10);
   assert.deepEqual(createRound(questions, [], 10), []);
 });
 

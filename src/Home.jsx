@@ -112,7 +112,7 @@ export default function Home() {
             Quiz lịch sử <span>↗</span>
           </h3>
           <p>
-            36 câu hỏi · 6 chủ đề
+            60 câu hỏi · 6 chủ đề
             <br />
             Tự luyện hoặc thử thách tính giờ
           </p>
