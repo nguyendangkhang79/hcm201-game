@@ -1,4 +1,4 @@
-import { bingoWords } from './data/bingo';
+import { readBingoWords } from './bingoStore';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -275,7 +275,7 @@ export default function Player() {
       ref(db, 'courses/vnr202/gameState/wordList'),
       (snapshot) => {
         setAllWords(
-          getUniqueWords(Object.values(snapshot.val() || bingoWords)),
+          readBingoWords(snapshot.val()),
         );
         setWordsLoaded(true);
       },

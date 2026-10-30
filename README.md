@@ -38,6 +38,8 @@ Mỗi lượt Quiz chọn ngẫu nhiên 10 hoặc 15 câu, không lặp. Nếu b
 
 Bingo chuyển sang `courses/vnr202/gameState` và `courses/vnr202/chat/messages`. Lần đăng nhập trọng tài đầu tiên khởi tạo kho từ khóa bằng transaction nếu chưa có dữ liệu. Không ghi đè kho đã tồn tại và không di chuyển/xóa phòng cũ.
 
+Xóa kho lưu `wordList: false` để phân biệt kho đã được xóa với kho chưa khởi tạo (`null`); không tự nạp lại từ mặc định sau khi xóa. Thao tác này đưa ván về trạng thái chuẩn bị và xóa kết quả. Trạng thái mở khóa trọng tài được giữ bằng `sessionStorage` trong tab hiện tại; đây chỉ là duy trì giao diện của cơ chế PIN cũ, không thay thế Firebase Authentication.
+
 ## Giới hạn bàn giao
 
 Đây là bản triển khai cục bộ, chưa đổi tên miền hoặc triển khai Vercel. Dữ liệu lịch sử đã kèm nguồn đối chiếu nhưng nhóm/giảng viên cần duyệt theo đúng giáo trình đang học. Có bốn địa điểm, chưa đủ sáu; Pò Hèn chưa có ảnh được cấp phép hoặc tour số. Không địa điểm nào được quảng cáo là tour 3D khi chưa xác minh.

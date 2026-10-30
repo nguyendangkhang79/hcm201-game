@@ -1,30 +1,42 @@
-import { bingoWords } from './data/bingo';
+import { clearedBingoState, readBingoWords, seedBingoWords } from './bingoStore';
 import { useEffect, useState } from 'react';
 import { onValue, push, ref, runTransaction, set, update } from 'firebase/database';
 import { db } from './firebase';
 import Chat from './Chat';
 import './Admin.css';
 
+const ADMIN_SESSION_KEY = 'vnr202.admin.unlocked';
+
+function hasAdminSession() {
+  try {
+    return sessionStorage.getItem(ADMIN_SESSION_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
 export default function Admin() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(hasAdminSession);
   const [pinCode, setPinCode] = useState('');
   const [wordList, setWordList] = useState([]);
   const [activeWords, setActiveWords] = useState([]);
   const [newWord, setNewWord] = useState('');
   const [gameStatus, setGameStatus] = useState('waiting');
   const [players, setPlayers] = useState([]);
+  const [isDeletingWords, setIsDeletingWords] = useState(false);
+  const [wordNotice, setWordNotice] = useState('');
 
   const ADMIN_PIN = '123456';
 
   useEffect(() => {
     if (!isAuthenticated) return undefined;
 
-    runTransaction(ref(db, 'courses/vnr202/gameState/wordList'), current => current === null ? bingoWords : undefined).catch(() => alert('Không thể khởi tạo từ khóa VNR202. Kiểm tra kết nối Firebase.'));
+    runTransaction(ref(db, 'courses/vnr202/gameState/wordList'), seedBingoWords).catch(() => alert('Không thể khởi tạo từ khóa VNR202. Kiểm tra kết nối Firebase.'));
 
     const unsubscribeWords = onValue(
       ref(db, 'courses/vnr202/gameState/wordList'),
       (snapshot) =>
-        setWordList(Object.values(snapshot.val() || bingoWords)),
+        setWordList(readBingoWords(snapshot.val())),
     );
 
     const unsubscribeActive = onValue(
@@ -56,10 +68,30 @@ export default function Admin() {
     event.preventDefault();
 
     if (pinCode === ADMIN_PIN) {
+      try {
+        sessionStorage.setItem(ADMIN_SESSION_KEY, 'true');
+      } catch {
+        // Storage may be disabled; the current page can still be unlocked.
+      }
       setIsAuthenticated(true);
     } else {
       alert('Sai mã PIN!');
       setPinCode('');
+    }
+  };
+
+  const handleDeleteWords = async () => {
+    if (isDeletingWords || !window.confirm('Xóa trắng toàn bộ kho từ khóa? Ván hiện tại sẽ về trạng thái chuẩn bị và xóa kết quả.')) return;
+
+    setIsDeletingWords(true);
+    setWordNotice('');
+    try {
+      await update(ref(db, 'courses/vnr202/gameState'), clearedBingoState());
+      setWordNotice('Đã xóa kho từ khóa. Bạn có thể thêm từ khóa mới.');
+    } catch {
+      setWordNotice('Không xóa được kho từ khóa. Kiểm tra kết nối hoặc quyền Firebase rồi thử lại.');
+    } finally {
+      setIsDeletingWords(false);
     }
   };
 
@@ -68,7 +100,7 @@ export default function Admin() {
 
     const word = newWord.trim();
 
-    if (!word) return;
+    if (!word || isDeletingWords) return;
 
     if (wordList.includes(word)) {
       alert('Từ này đã tồn tại!');
@@ -314,6 +346,7 @@ export default function Admin() {
                     id="admin-new-word"
                     className="admin-input"
                     type="text"
+                    disabled={isDeletingWords}
                     value={newWord}
                     onChange={(event) =>
                       setNewWord(event.target.value)
@@ -323,6 +356,7 @@ export default function Admin() {
 
                   <button
                     type="submit"
+                    disabled={isDeletingWords}
                     className="admin-button admin-button-primary"
                   >
                     <span aria-hidden="true">+</span>
@@ -334,6 +368,7 @@ export default function Admin() {
               <p className="admin-field-hint">
                 Kho đang có <strong>{wordList.length}</strong>{' '}
                 từ khóa.
+                {wordList.length < 25 && ' Cần ít nhất 25 từ khóa để bắt đầu ván.'}
               </p>
             </section>
 
@@ -446,7 +481,7 @@ export default function Admin() {
               <button
                 type="button"
                 onClick={startGame}
-                disabled={gameStatus !== 'waiting'}
+                disabled={gameStatus !== 'waiting' || wordList.length < 25 || isDeletingWords}
                 className="admin-button admin-button-start"
               >
                 <span aria-hidden="true">▶</span>
@@ -489,17 +524,13 @@ export default function Admin() {
 
               <button
                 type="button"
-                onClick={() =>
-                  window.confirm('Xóa trắng toàn bộ kho từ khóa?') &&
-                  update(ref(db, 'courses/vnr202/gameState'), {
-                    wordList: null,
-                    activeWords: null,
-                  })
-                }
+                onClick={handleDeleteWords}
+                disabled={isDeletingWords}
                 className="admin-button admin-button-delete"
               >
-                Xóa kho từ khóa
+                {isDeletingWords ? 'Đang xóa kho từ khóa…' : 'Xóa kho từ khóa'}
               </button>
+              {wordNotice && <p role="status">{wordNotice}</p>}
 
               <button
                 type="button"
