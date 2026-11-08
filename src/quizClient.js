@@ -5,21 +5,26 @@ export class QuizApiError extends Error {
   }
 }
 
-export async function quizRequest(input, signal) {
+export async function quizRequest(input, signal, importKey) {
   let response;
   try {
     response = await fetch("/api/quiz", {
       method: input ? "POST" : "GET",
       credentials: "same-origin",
       cache: "no-store",
-      headers: input ? { "Content-Type": "application/json" } : {},
+      headers: {
+        ...(input ? { "Content-Type": "application/json" } : {}),
+        ...(importKey ? { Authorization: `Bearer ${importKey}` } : {}),
+      },
       ...(input ? { body: JSON.stringify(input) } : {}),
       signal: signal || AbortSignal.timeout(12000),
     });
   } catch {
     throw new QuizApiError(
       "NETWORK_ERROR",
-      "Mất kết nối với máy chủ. Đáp án có thể chưa được lưu; hãy đồng bộ bài làm trước khi thử lại.",
+      importKey
+        ? "Mất kết nối với máy chủ. Hãy tải lại ngân hàng để kiểm tra thay đổi."
+        : "Mất kết nối với máy chủ. Đáp án có thể chưa được lưu; hãy đồng bộ bài làm trước khi thử lại.",
     );
   }
   let data;
@@ -70,12 +75,8 @@ export function exportQuizResult(session) {
       .replaceAll('"', '""')
       .replace(/^[\s\uFEFF]*[=+@-]/, "'$&")}"`;
   const rows = [
-    ["Tên", session.name],
-    ["Điểm", session.result.points],
     ["Đúng", session.result.correct],
     ["Tổng câu", session.total],
-    ["Thời gian (giây)", session.result.elapsedSeconds],
-    ["Lần ghi nhận rời tab", session.focusLosses],
     [],
     [
       "Câu",
@@ -96,7 +97,7 @@ export function exportQuizResult(session) {
       q.options.find((o) => o.id === q.correctOptionId)?.text,
       q.correct ? "Đúng" : "Sai / chưa làm",
       q.explanation,
-      q.source.url,
+      q.source?.url,
     ]),
   );
   const url = URL.createObjectURL(

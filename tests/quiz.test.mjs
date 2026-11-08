@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { questions, topics } from "../server/questionBank.js";
+import { questions, topics } from "./fixtures/quizQuestions.js";
 import { bingoWords } from "../src/data/bingo.js";
 import { createRound, scoreRound } from "../src/quizEngine.js";
 
@@ -15,8 +15,10 @@ test("bank has 60 complete questions across six topics, valid answers and source
     assert.ok(q.explanation.length > 15);
     assert.equal(new URL(q.source.url).protocol, "https:");
   }
-  for (const topic of topics)
-    assert.equal(questions.filter((q) => q.topic === topic.id).length, 10);
+  const fixtureTopicIds = new Set(questions.map((q) => q.topic));
+  assert.equal(fixtureTopicIds.size, 6);
+  for (const id of fixtureTopicIds)
+    assert.equal(questions.filter((q) => q.topic === id).length, 10);
 });
 
 test("round selection respects topics and size without duplicates or mutating bank", () => {

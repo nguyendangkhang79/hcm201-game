@@ -5,6 +5,7 @@ import Admin from "./Admin";
 import LiveDashboard from "./LiveDashboard";
 import Explore from "./Explore";
 import Quiz from "./Quiz";
+import QuizStudy from "./QuizStudy";
 import Bingo from "./Bingo";
 import { Link } from "react-router-dom";
 import Layout from "./Layout";
@@ -16,6 +17,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/quiz" element={<Quiz />} />
+        <Route path="/quiz/study/:topicId" element={<QuizStudy />} />
         <Route path="/bingo" element={<Bingo />} />
         <Route path="/play" element={<Player />} />
         <Route path="/admin" element={<Admin />} />

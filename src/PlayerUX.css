@@ -4,9 +4,9 @@
   --gold: #9b702b;
   --cream: #30282b;
   --ink: #30282b;
-  background: #f5f2ec;
+  background: var(--cream-paper);
   color: #30282b;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: var(--sans);
 }
 
 .player-page::before {
@@ -34,7 +34,7 @@
   border: 1px solid #68303b;
   border-bottom: 3px solid #e8c37d;
   border-radius: 14px;
-  background: linear-gradient(110deg, #3c171f, #702936);
+  background: var(--wine-gradient);
   box-shadow: 0 8px 24px #48202b0b;
 }
 
@@ -219,7 +219,7 @@
 .player-page .board-panel .section-heading h2,
 .player-page .word-panel .section-heading h2 {
   color: #42252d;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: var(--sans);
   font-size: 20px;
   font-weight: 700;
   line-height: 1.4;

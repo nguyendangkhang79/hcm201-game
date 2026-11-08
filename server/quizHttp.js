@@ -1,10 +1,14 @@
-import { createHmac, randomUUID, timingSafeEqual } from "node:crypto";
-import { QuizError } from "./quizService.js";
+import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto";
+import { QuizError } from "./quizError.js";
+import { importBodyLimit } from "./quizImport.js";
 
 export function createQuizHandler({
   service,
   store,
+  questionBank,
   secret,
+  importSecret,
+  studyEnabled = true,
   development = false,
 }) {
   if (!secret || secret.length < 32)
@@ -12,6 +16,10 @@ export function createQuizHandler({
   const cookieName = development ? "vnr_quiz_actor" : "__Host-vnr_quiz_actor";
   const sign = (text) =>
     createHmac("sha256", secret).update(text).digest("base64url");
+  const digest = (text) => createHash("sha256").update(text).digest();
+  const importCredential = importSecret?.length >= 32
+    ? digest(`Bearer ${importSecret}`)
+    : null;
   function actorCookie(req, res) {
     const cookies = String(req.headers.cookie || "")
       .split(";")
@@ -97,12 +105,17 @@ export function createQuizHandler({
           "Thao tác quá nhanh. Vui lòng chờ một phút.",
         );
       if (req.method === "GET")
-        return send(200, { ...service.catalog(), development });
+        return send(200, { ...(await service.catalog()), development, studyEnabled });
+      const authorizedImport = importCredential && timingSafeEqual(
+        digest(String(req.headers.authorization || "")),
+        importCredential,
+      );
+      const bodyLimit = authorizedImport ? importBodyLimit : 16384;
       let input;
       if (req.body !== undefined) {
         const raw =
           typeof req.body === "string" ? req.body : JSON.stringify(req.body);
-        if (Buffer.byteLength(raw) > 16384)
+        if (Buffer.byteLength(raw) > bodyLimit)
           throw new QuizError(
             413,
             "BODY_TOO_LARGE",
@@ -110,17 +123,20 @@ export function createQuizHandler({
           );
         input = JSON.parse(raw);
       } else {
-        let raw = "";
+        const chunks = [];
+        let size = 0;
         for await (const chunk of req) {
-          raw += chunk;
-          if (Buffer.byteLength(raw) > 16384)
+          const buffer = Buffer.from(chunk);
+          size += buffer.length;
+          if (size > bodyLimit)
             throw new QuizError(
               413,
               "BODY_TOO_LARGE",
               "Dữ liệu yêu cầu quá lớn.",
             );
+          chunks.push(buffer);
         }
-        input = JSON.parse(raw);
+        input = JSON.parse(Buffer.concat(chunks).toString("utf8"));
       }
       if (!input || typeof input !== "object" || Array.isArray(input))
         throw new QuizError(
@@ -128,6 +144,24 @@ export function createQuizHandler({
           "INVALID_BODY",
           "Dữ liệu yêu cầu không hợp lệ.",
         );
+      if (["import", "bank-list", "bank-edit", "bank-toggle", "bank-delete", "bank-migrate"].includes(input.action)) {
+        if (!importCredential)
+          throw new QuizError(503, "IMPORT_DISABLED", "Máy chủ chưa cấu hình khóa quản lý Quiz.");
+        if (!authorizedImport)
+          throw new QuizError(403, "IMPORT_FORBIDDEN", "Khóa quản lý Quiz không hợp lệ.");
+        if (input.action === "bank-list")
+          return send(200, { questions: await questionBank.list() });
+        if (input.action === "import")
+          return send(200, await questionBank.importQuestions(input.questions));
+        if (input.action === "bank-migrate")
+          return send(200, await questionBank.importLegacy(await store.getImportedQuestions()));
+        return send(200, await questionBank.changeQuestion(input.action, input));
+      }
+      if (input.action === "study") {
+        if (!studyEnabled)
+          throw new QuizError(403, "STUDY_DISABLED", "Chế độ xem đáp án đang tắt.");
+        return send(200, await service.study(input.topicId));
+      }
       const actions = [
         "start",
         "active",
@@ -136,10 +170,11 @@ export function createQuizHandler({
         "answer",
         "next",
         "finish",
-        "focus",
       ];
       if (!actions.includes(input.action))
         throw new QuizError(400, "INVALID_ACTION", "Thao tác không hợp lệ.");
+      if (input.action === "start" && input.mode !== "practice")
+        throw new QuizError(400, "INVALID_SETTINGS", "Quiz chỉ hỗ trợ ôn tập không giới hạn thời gian.");
       if (
         input.action === "start" &&
         !(await store.limit(`start:${actor}`, 20, 3600))
@@ -149,12 +184,13 @@ export function createQuizHandler({
           "START_LIMIT",
           "Bạn đã tạo nhiều lượt. Hãy quay lại sau.",
         );
+      const options = { resumeUntimed: true };
       const state =
         input.action === "start"
           ? await service.start(actor, input)
           : input.action === "active"
-            ? await service.active(actor, input.clientId)
-            : await service.act(actor, input.action, input);
+            ? await service.active(actor, input.clientId, options)
+            : await service.act(actor, input.action, input, options);
       return send(200, { state, development });
     } catch (error) {
       const known = error instanceof QuizError;

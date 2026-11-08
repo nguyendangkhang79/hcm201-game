@@ -1,5 +1,6 @@
 const TTL = 48 * 60 * 60;
 const PREFIX = "vnr202:quiz:v1:";
+const IMPORT_KEY = `${PREFIX}imported`;
 
 // Development/test only. Production always uses durable Redis.
 export function createMemoryStore() {
@@ -7,6 +8,9 @@ export function createMemoryStore() {
   const actors = new Map();
   const limits = new Map();
   return {
+    async getImportedQuestions() {
+      return [];
+    },
     async start(actor, attempt) {
       const existing = attempts.get(actors.get(actor));
       if (existing && !existing.finishedAt) return structuredClone(existing);
@@ -57,6 +61,10 @@ export function createRedisStore({ url, token, fetcher = fetch }) {
     return data.result;
   }
   return {
+    async getImportedQuestions() {
+      const values = await command(["HVALS", IMPORT_KEY]);
+      return values.map((value) => JSON.parse(value));
+    },
     async start(actor, attempt) {
       const script = `local id=redis.call('GET',KEYS[1]); if id then local old=redis.call('GET',ARGV[1]..id); if old and cjson.decode(old).finishedAt==cjson.null then return old end end; redis.call('SET',KEYS[2],ARGV[2],'EX',ARGV[3]); redis.call('SET',KEYS[1],ARGV[4],'EX',ARGV[3]); return ARGV[2]`;
       return JSON.parse(

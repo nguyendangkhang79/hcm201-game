@@ -1,6 +1,16 @@
 {
   "rules": {
-    ".read": true,
-    ".write": true
+    "courses": {
+      ".read": true,
+      ".write": true
+    },
+    "gameState": {
+      ".read": true,
+      ".write": true
+    },
+    "quizBank": {
+      ".read": "auth != null && auth.uid === 'vnr202-quiz-server'",
+      ".write": "auth != null && auth.uid === 'vnr202-quiz-server'"
+    }
   }
 }

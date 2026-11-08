@@ -1,12 +1,7 @@
 import { randomInt, randomUUID } from "node:crypto";
+import { QuizError } from "./quizError.js";
 
-export class QuizError extends Error {
-  constructor(status, code, message) {
-    super(message);
-    this.status = status;
-    this.code = code;
-  }
-}
+export { QuizError };
 const reject = (status, code, message) => {
   throw new QuizError(status, code, message);
 };
@@ -23,20 +18,39 @@ const shuffled = (values) => {
 
 export function createQuizService({
   store,
-  bank,
+  questionBank,
   topics,
   clock = Date.now,
   secondsPerQuestion = 45,
 }) {
-  function catalog() {
+  async function availableQuestions() {
+    const knownTopics = new Set(topics.map(({ id }) => id));
+    return (await questionBank.list()).filter((question) => question.enabled && knownTopics.has(question.topic));
+  }
+  async function catalog() {
+    const questions = await availableQuestions();
     return {
       topics: topics.map((t) => ({
         ...t,
-        count: bank.filter((q) => q.topic === t.id).length,
-      })),
-      total: bank.length,
-      secondsPerQuestion,
+        count: questions.filter((q) => q.topic === t.id).length,
+      })).filter((topic) => topic.count > 0),
+      total: questions.length,
     };
+  }
+  async function study(topicId) {
+    const topic = topics.find(({ id }) => id === topicId);
+    if (!topic) reject(400, "INVALID_TOPICS", "Chủ đề ôn tập không hợp lệ.");
+    const questions = (await availableQuestions())
+      .filter((question) => question.topic === topicId)
+      .map(({ id, question, options, correctAnswer, explanation, source, study: metadata }) => ({
+        id,
+        code: metadata?.code ?? explanation?.match(/Đối chiếu: ((?:NM|C[123]|KL)-\d{3})\b/u)?.[1] ?? null,
+        group: metadata?.group ?? null,
+        question, options, correctAnswer, explanation, source,
+      }))
+      .sort((a, b) => (a.code ?? "~").localeCompare(b.code ?? "~") ||
+        a.question.localeCompare(b.question, "vi") || a.id.localeCompare(b.id));
+    return { topic, questions };
   }
   function finish(attempt, reason, now) {
     attempt.finishedAt = reason === "timeout" ? attempt.deadline : now;
@@ -112,7 +126,8 @@ export function createQuizService({
       !name.trim() ||
       name.trim().length > 30 ||
       !["practice", "challenge"].includes(mode) ||
-      ![10, 15].includes(count) ||
+      !Number.isSafeInteger(count) || count < 1 ||
+      (mode === "challenge" && count > 15) ||
       !uuid(clientId) ||
       !uuid(requestId)
     )
@@ -129,7 +144,7 @@ export function createQuizService({
       topicIds.some((id) => !topics.some((t) => t.id === id))
     )
       reject(400, "INVALID_TOPICS", "Hãy chọn chủ đề hợp lệ.");
-    const candidates = bank.filter((q) => topicIds.includes(q.topic));
+    const candidates = (await availableQuestions()).filter((q) => topicIds.includes(q.topic));
     if (candidates.length < count)
       reject(
         400,
@@ -192,7 +207,7 @@ export function createQuizService({
       return act(actor, "resume", { attemptId: active.id, clientId });
     return publicState(active);
   }
-  async function act(actor, action, input) {
+  async function act(actor, action, input, { resumeUntimed = false } = {}) {
     const { attemptId, clientId } = input;
     if (!uuid(attemptId) || !uuid(clientId))
       reject(400, "INVALID_ATTEMPT", "Mã bài làm không hợp lệ.");
@@ -206,6 +221,15 @@ export function createQuizService({
         );
       const attempt = structuredClone(saved);
       const now = clock();
+      if (
+        resumeUntimed &&
+        action === "resume" &&
+        !attempt.finishedAt &&
+        attempt.mode === "challenge"
+      ) {
+        attempt.mode = "practice";
+        attempt.deadline = null;
+      }
       const timedOut =
         !attempt.finishedAt && attempt.deadline && now >= attempt.deadline;
       if (timedOut) finish(attempt, "timeout", now);
@@ -284,9 +308,9 @@ export function createQuizService({
       "Bài làm vừa thay đổi. Đồng bộ lại rồi thử lại.",
     );
   }
-  async function active(actor, clientId) {
+  async function active(actor, clientId, options) {
     const id = await store.active(actor);
-    return id ? act(actor, "resume", { attemptId: id, clientId }) : null;
+    return id ? act(actor, "resume", { attemptId: id, clientId }, options) : null;
   }
-  return { catalog, start, act, active };
+  return { catalog, study, start, act, active };
 }

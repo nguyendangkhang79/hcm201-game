@@ -32,7 +32,7 @@
 .player-page .player-brand-text strong,
 .live-page .live-brand strong {
   color: #4a1720;
-  font-family: 'Noto Serif', 'Segoe UI', Arial, sans-serif;
+  font-family: var(--sans);
   font-size: 16px;
   font-weight: 700;
   line-height: 1.5;
@@ -46,7 +46,7 @@
 .live-page .live-brand small {
   margin: 0;
   color: #8b6a36;
-  font-family: 'Segoe UI', 'Noto Sans', Arial, sans-serif;
+  font-family: var(--sans);
   font-size: 8px;
   font-weight: 600;
   line-height: 1.5;
@@ -74,6 +74,14 @@
   font-size: 13px;
   font-weight: 600;
   line-height: 1.5;
+}
+
+.live-page .live-header .live-brand strong {
+  color: var(--cream-light);
+}
+
+.live-page .live-header .live-brand small {
+  color: var(--gold-light);
 }
 
 .live-page .live-brand:focus-visible {

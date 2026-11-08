@@ -1,5 +1,50 @@
 @import "tailwindcss";
-:root { --sans:'Segoe UI','Noto Sans',Arial,sans-serif; --heading:'Segoe UI','Noto Sans',Arial,sans-serif; font-family:'Segoe UI','Noto Sans',Arial,sans-serif; color:#252525; background:#f7f3eb; font-synthesis:none; text-rendering:optimizeLegibility; -webkit-font-smoothing:antialiased; color-scheme:light; }
+
+@font-face {
+  font-family: Gilroy;
+  src: url('./assets/fonts/gilroy-regular.woff') format('woff');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: Gilroy;
+  src: url('./assets/fonts/gilroy-semibold.woff') format('woff');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: Gilroy;
+  src: url('./assets/fonts/gilroy-bold.woff') format('woff');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: Huxley;
+  src: url('./assets/fonts/huxley-extrablack.woff') format('woff');
+  font-weight: 900;
+  font-display: swap;
+}
+
+:root {
+  --sans: Gilroy, 'Segoe UI', Arial, sans-serif;
+  --heading: var(--sans);
+  --display: Huxley, var(--heading);
+  --wine-deep: #540000;
+  --wine: #820d18;
+  --wine-bright: #a51a24;
+  --wine-gradient: linear-gradient(120deg, var(--wine-deep), var(--wine) 65%, var(--wine-bright));
+  --cream-paper: #fcf5e4;
+  --cream-light: #fffbf2;
+  --gold-light: #ffcf8f;
+  --ink-warm: #392320;
+  font-family: var(--sans);
+  color: var(--ink-warm);
+  background: var(--cream-paper);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: light;
+}
 * { box-sizing:border-box; }
 body { margin:0; }
 #root { min-height:100svh; }

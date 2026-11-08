@@ -1,6 +1,6 @@
-import { sources } from "../src/data/sources.js";
+import { sources } from "../../src/data/sources.js";
 
-import { topics } from "../src/data/quiz.js";
+import { topics } from "../../src/data/quiz.js";
 export { topics };
 // Mỗi dòng: chủ đề, câu hỏi, 4 phương án, chỉ số đáp án (0–3), lời giải, nguồn.
 const rows = [

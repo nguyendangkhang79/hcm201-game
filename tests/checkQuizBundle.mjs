@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile, readdir } from 'node:fs/promises';
-import { questions } from '../server/questionBank.js';
+import { questions } from './fixtures/quizQuestions.js';
 
 const assets = await readdir(new URL('../dist/assets/', import.meta.url));
 const scripts = await Promise.all(assets.filter(file => file.endsWith('.js') || file.endsWith('.map')).map(file => readFile(new URL(`../dist/assets/${file}`, import.meta.url), 'utf8')));

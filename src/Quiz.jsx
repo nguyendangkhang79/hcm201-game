@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import Layout from "./Layout";
+import { practiceCounts, topics } from "./data/quiz.js";
 import {
-  estimateServerNow,
   exportQuizResult,
   quizRequest,
   readStoredSettings,
-  secondsRemaining,
 } from "./quizClient";
 import "./Quiz.css";
 
 const letters = ["A", "B", "C", "D"];
-const timeText = (seconds) =>
-  `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 const draftKey = "vnr202.quiz.draft";
 const readDraft = () => {
   try {
@@ -22,11 +20,15 @@ const readDraft = () => {
 };
 
 export default function Quiz() {
-  const [settings, setSettings] = useState(readStoredSettings);
+  const [params] = useSearchParams();
+  const [settings, setSettings] = useState(() => {
+    const saved = readStoredSettings();
+    const topic = params.get("topic");
+    return topics.some(({ id }) => id === topic) ? { ...saved, topicIds: [topic] } : saved;
+  });
   const [catalog, setCatalog] = useState(null);
   const [session, setSession] = useState(null);
   const [choice, setChoice] = useState(null);
-  const [now, setNow] = useState(0);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,32 +37,31 @@ export default function Quiz() {
   const [clientId] = useState(() => crypto.randomUUID());
   const busyRef = useRef(false);
   const sessionRef = useRef(null);
-  const clockRef = useRef(null);
   const draftRef = useRef(readDraft());
   const headingRef = useRef(null);
   const startedRequestRef = useRef(null);
-  const name = typeof settings.name === "string" ? settings.name : "";
-  const mode = settings.mode === "challenge" ? "challenge" : "practice";
-  const count = settings.count === 15 ? 15 : 10;
-  const topicIds = Array.isArray(settings.topicIds)
-    ? settings.topicIds
-    : catalog?.topics.map((t) => t.id) || [];
+  const catalogTopicIds = catalog?.topics.map((topic) => topic.id) || [];
+  const savedTopicIds = Array.isArray(settings.topicIds) ? settings.topicIds : null;
+  const matchingTopicIds = savedTopicIds?.filter((id) => catalogTopicIds.includes(id));
+  const topicIds = matchingTopicIds?.length || savedTopicIds?.length === 0
+    ? matchingTopicIds
+    : catalogTopicIds;
   const available =
     catalog?.topics
       .filter((t) => topicIds.includes(t.id))
       .reduce((sum, t) => sum + t.count, 0) || 0;
-  const remaining = secondsRemaining(session?.deadline, now);
+  const countOptions = practiceCounts.filter((size) => size < available);
+  const preferredCount = practiceCounts.includes(settings.practiceCount)
+    ? settings.practiceCount
+    : practiceCounts[0];
+  const count = settings.practiceCount === "all"
+    ? available
+    : Math.min(preferredCount, available);
 
   const apply = useCallback((state) => {
     if (!state) return;
     const previous = sessionRef.current;
     if (previous?.id === state.id && previous.revision > state.revision) return;
-    clockRef.current = {
-      serverNow: state.serverNow,
-      wallNow: Date.now(),
-      monotonicNow: performance.now(),
-    };
-    setNow(state.serverNow);
     sessionRef.current = state;
     setSession(state);
     const draft = draftRef.current;
@@ -126,8 +127,6 @@ export default function Quiz() {
           apply(current.state);
           setSettings((value) => ({
             ...value,
-            name: current.state.name,
-            mode: current.state.mode,
             topicIds: current.state.topicIds,
             count: current.state.total,
           }));
@@ -156,19 +155,9 @@ export default function Quiz() {
   const active = Boolean(session && !session.finishedAt);
   useEffect(() => {
     if (!active || moved) return undefined;
-    const tick = () =>
-      setNow(
-        estimateServerNow(clockRef.current, Date.now(), performance.now()),
-      );
-    const timer = setInterval(tick, 250);
     const sync = setInterval(() => run("status"), 10000);
     const visibility = () => {
-      if (
-        document.visibilityState === "hidden" &&
-        sessionRef.current?.mode === "challenge"
-      )
-        run("focus", { eventId: crypto.randomUUID() });
-      else if (document.visibilityState === "visible") run("status");
+      if (document.visibilityState === "visible") run("status");
     };
     const refresh = () => run("status");
     document.addEventListener("visibilitychange", visibility);
@@ -176,7 +165,6 @@ export default function Quiz() {
     window.addEventListener("focus", refresh);
     window.addEventListener("online", refresh);
     return () => {
-      clearInterval(timer);
       clearInterval(sync);
       document.removeEventListener("visibilitychange", visibility);
       window.removeEventListener("pageshow", refresh);
@@ -184,17 +172,6 @@ export default function Quiz() {
       window.removeEventListener("online", refresh);
     };
   }, [active, moved, run]);
-
-  useEffect(() => {
-    if (!active || remaining !== 0 || moved) return undefined;
-    // Ask the server to finalize. Never invent a result on the client, even offline.
-    const timer = setInterval(() => run("status"), 2000);
-    const immediate = setTimeout(() => run("status"), 0);
-    return () => {
-      clearInterval(timer);
-      clearTimeout(immediate);
-    };
-  }, [active, remaining, moved, run]);
 
   const questionId = session?.question?.id;
   const finishedAt = session?.finishedAt;
@@ -208,11 +185,11 @@ export default function Quiz() {
   }
   async function start(event) {
     event?.preventDefault();
-    if (!name.trim() || available < count || loading) return;
+    if (!count || loading) return;
     startedRequestRef.current ||= crypto.randomUUID();
     const result = await run("start", {
-      name: name.trim(),
-      mode,
+      name: "Người học",
+      mode: "practice",
       count,
       topicIds,
       requestId: startedRequestRef.current,
@@ -245,13 +222,6 @@ export default function Quiz() {
   return (
     <Layout>
       <section className="page-width section-space quiz-page">
-        <p className="eyebrow">KIẾN THỨC QUA TRẢI NGHIỆM / QUIZ VNR202</p>
-        {catalog?.development && (
-          <p className="quiz-notice">
-            Bản chạy tại máy để kiểm thử. Bài làm trên Vercel cần cấu hình máy
-            chủ riêng; khởi động lại máy chủ local có thể mất phiên.
-          </p>
-        )}
         {error && (
           <div className="quiz-error" role="alert">
             <p>{error}</p>
@@ -283,147 +253,109 @@ export default function Quiz() {
         ) : !session ? (
           <>
             <div className="quiz-intro">
-              <h1 className="page-title">
-                Hiểu bước ngoặt.
-                <br />
-                <em>Thử trí nhớ.</em>
-              </h1>
+              <div>
+              <p className="quiz-kicker">VNR202 · GÓC ÔN TẬP</p>
+              <h1 className="page-title">Ôn tập lịch sử Đảng</h1>
               <p className="page-intro">
-                1975–1986: xây dựng CNXH, bảo vệ Tổ quốc và bước ngoặt Đại hội
-                VI. Mỗi chủ đề có 10 câu để tự luyện.
+                {catalog?.studyEnabled
+                  ? "Học theo chương, xem đáp án và dùng thẻ ghi nhớ trước khi tự kiểm tra."
+                  : "Chọn chủ đề và đọc lời giải sau mỗi câu trả lời."}
               </p>
+              </div>
+              {catalog && <div className="quiz-hero-index">
+                <strong>{catalog.total}</strong><span>câu hỏi</span>
+                <span>{catalog.topics.length} chủ đề ôn tập</span>
+              </div>}
             </div>
             <form onSubmit={start} className="quiz-setup">
               <div className="topic-selection">
                 <div className="section-heading">
-                  <h2>01. Chọn chủ đề ôn tập</h2>
+                  <h2>Chủ đề ôn tập</h2>
                   <button
                     type="button"
                     className="text-link"
                     onClick={() =>
                       setSetting(
                         "topicIds",
-                        catalog.topics.map((t) => t.id),
+                        topicIds.length === catalogTopicIds.length ? [] : catalogTopicIds,
                       )
                     }
-                    disabled={!catalog}
+                    disabled={!catalogTopicIds.length}
                   >
-                    Chọn tất cả
+                    {catalogTopicIds.length > 0 && topicIds.length === catalogTopicIds.length ? "Bỏ chọn tất cả" : "Chọn tất cả"}
                   </button>
                 </div>
-                <p>Kết hợp nhiều chủ đề để tạo lượt 15 câu.</p>
+                <p>Bạn có thể ôn một chủ đề hoặc kết hợp nhiều chủ đề.</p>
                 <div className="topic-grid">
                   {catalog?.topics.map((topic, i) => (
-                    <label
+                    <div
                       key={topic.id}
                       className={`topic-option ${topicIds.includes(topic.id) ? "selected" : ""}`}
                     >
-                      <input
-                        type="checkbox"
-                        checked={topicIds.includes(topic.id)}
-                        onChange={() =>
-                          setSetting(
-                            "topicIds",
-                            topicIds.includes(topic.id)
-                              ? topicIds.filter((id) => id !== topic.id)
-                              : [...topicIds, topic.id],
-                          )
-                        }
-                      />
-                      <span className="topic-number">0{i + 1}</span>
-                      <strong>{topic.title}</strong>
-                      <span>{topic.description}</span>
-                      <small>{topic.count} câu hỏi</small>
-                    </label>
+                      <label className="quiz-topic-toggle">
+                        <input
+                          type="checkbox"
+                          checked={topicIds.includes(topic.id)}
+                          onChange={() =>
+                            setSetting(
+                              "topicIds",
+                              topicIds.includes(topic.id)
+                                ? topicIds.filter((id) => id !== topic.id)
+                                : [...topicIds, topic.id],
+                            )
+                          }
+                        />
+                        <span className="topic-number">{String(i + 1).padStart(2, "0")}</span>
+                        <strong>{topic.title}</strong>
+                        <span>{topic.description}</span>
+                        <small>{topic.count} câu hỏi</small>
+                      </label>
+                      {catalog.studyEnabled && <div className="quiz-topic-links">
+                        <Link className="quiz-study-link" to={`/quiz/study/${topic.id}`}>Xem đáp án</Link>
+                        <Link className="quiz-study-link" to={`/quiz/study/${topic.id}?mode=cards`}>Thẻ ghi nhớ</Link>
+                      </div>}
+                    </div>
                   ))}
-                </div>
-                <div className="quiz-policy">
-                  <strong>Cách bảo vệ lượt thử thách</strong>
-                  <p>
-                    Câu hỏi và phương án được đảo ngẫu nhiên. Máy chủ khóa đáp
-                    án khi xác nhận, tính giờ và chấm điểm. Tải lại trang tiếp
-                    tục bài cũ; mở bài ở tab khác sẽ chuyển quyền thao tác sang
-                    tab đó.
-                  </p>
-                  <p>
-                    Lượt rời tab được ghi nhận để tham khảo, không tự trừ điểm.
-                    Hệ thống không dùng camera và không thể ngăn tra cứu bằng
-                    thiết bị khác.
-                  </p>
-                  <p>
-                    Ngân hàng có nguồn tham khảo; nhóm cần đối chiếu với giáo
-                    trình của lớp trước khi dùng để đánh giá.
-                  </p>
                 </div>
               </div>
               <div className="setup-card">
-                <h2>02. Sẵn sàng bắt đầu</h2>
-                <label htmlFor="quiz-name">Tên người chơi</label>
-                <input
-                  id="quiz-name"
-                  value={name}
-                  maxLength={30}
-                  required
-                  autoComplete="name"
-                  onChange={(e) => setSetting("name", e.target.value)}
-                  placeholder="Tên của bạn"
-                />
-                <fieldset>
-                  <legend>Chế độ chơi</legend>
-                  <label className="mode-option">
-                    <input
-                      type="radio"
-                      name="mode"
-                      checked={mode === "practice"}
-                      onChange={() => setSetting("mode", "practice")}
-                    />
-                    <span>
-                      <strong>Tự luyện</strong>
-                      <small>Không tính giờ · Lời giải sau khi xác nhận</small>
-                    </span>
-                  </label>
-                  <label className="mode-option">
-                    <input
-                      type="radio"
-                      name="mode"
-                      checked={mode === "challenge"}
-                      onChange={() => setSetting("mode", "challenge")}
-                    />
-                    <span>
-                      <strong>Thử thách</strong>
-                      <small>
-                        45 giây/câu, tính chung cả bài · Đáp án cuối lượt
-                      </small>
-                    </span>
-                  </label>
+                <p className="quiz-kicker">LUYỆN TRẮC NGHIỆM</p>
+                <h2>Thiết lập lượt ôn</h2>
+                <p className="quiz-selection-summary">{topicIds.length} chủ đề · {available} câu có sẵn</p>
+                <fieldset className="quiz-counts" disabled={!available || busy}>
+                  <legend>Số câu ôn tập</legend>
+                  {countOptions.map((size) => (
+                    <label key={size}>
+                      <input type="radio" name="quiz-count" checked={count === size}
+                        onChange={() => setSetting("practiceCount", size)} />
+                      {size} câu
+                    </label>
+                  ))}
+                  {available > 0 && <label className="quiz-count-all">
+                    <input type="radio" name="quiz-count" checked={count === available}
+                      onChange={() => setSetting("practiceCount", "all")} />
+                    Ôn toàn bộ · {available} câu
+                  </label>}
                 </fieldset>
-                <label htmlFor="quiz-count">Số câu mỗi lượt</label>
-                <select
-                  id="quiz-count"
-                  value={count}
-                  onChange={(e) => setSetting("count", Number(e.target.value))}
-                >
-                  <option value={10}>10 câu</option>
-                  <option value={15}>15 câu</option>
-                </select>
                 <p role="status">
-                  {available >= count
-                    ? `${count} câu từ ${available} câu đã chọn.`
-                    : `Đã chọn ${available} câu. Hãy chọn thêm chủ đề hoặc chuyển sang 10 câu.`}
+                  {available
+                    ? count === available
+                      ? "Lượt này gồm toàn bộ câu hỏi trong các chủ đề đã chọn."
+                      : `Lấy ngẫu nhiên ${count} trong ${available} câu thuộc các chủ đề đã chọn.`
+                    : catalog?.total
+                      ? "Hãy chọn chủ đề có câu hỏi."
+                      : catalog && "Ngân hàng chưa có câu hỏi đang bật."}
                 </p>
                 <button
                   className="button"
-                  disabled={
-                    busy || !catalog || !name.trim() || available < count
-                  }
+                  disabled={busy || loading || !count}
                 >
                   {busy
                     ? "Đang tạo bài…"
-                    : `Bắt đầu ${mode === "practice" ? "tự luyện" : "thử thách"} →`}
+                    : "Bắt đầu ôn tập →"}
                 </button>
                 <p>
-                  Không cần tài khoản · 100 điểm/câu đúng · Lưu bài tối đa 48
-                  giờ
+                  Không giới hạn thời gian. Bài làm được lưu tối đa 48 giờ.
                 </p>
               </div>
             </form>
@@ -433,21 +365,20 @@ export default function Quiz() {
             <div className="result-banner">
               <div>
                 <p className="eyebrow">
-                  {session.finishReason === "timeout"
-                    ? "ĐÃ HẾT THỜI GIAN"
-                    : "HOÀN THÀNH LƯỢT CHƠI"}
+                  TỔNG KẾT ÔN TẬP
                 </p>
                 <h1 ref={headingRef} tabIndex={-1}>
-                  Dấu ấn của {session.name}.
+                  Xem lại bài ôn tập
                 </h1>
-                <p>Kết quả được chấm và lưu bởi máy chủ.</p>
+                <p>Đọc lời giải và xem lại các câu cần ôn thêm.</p>
               </div>
-              <div className="result-score">
-                {result.percentage}
-                <span>% chính xác</span>
-              </div>
+              <div className="quiz-score"><strong>{Math.round(result.correct * 100 / session.total)}%</strong><span>độ chính xác</span></div>
             </div>
             <div className="result-stats">
+              <div>
+                <strong>{session.total - result.correct - result.skipped}</strong>
+                <span>Câu sai</span>
+              </div>
               <div>
                 <strong>
                   {result.correct}/{session.total}
@@ -455,25 +386,13 @@ export default function Quiz() {
                 <span>Câu đúng</span>
               </div>
               <div>
-                <strong>{result.points}</strong>
-                <span>Tổng điểm</span>
-              </div>
-              <div>
-                <strong>{timeText(result.elapsedSeconds)}</strong>
-                <span>Thời gian làm bài</span>
-              </div>
-              <div>
                 <strong>{result.skipped}</strong>
                 <span>Chưa trả lời</span>
               </div>
             </div>
-            <p className="quiz-notice">
-              Rời tab được ghi nhận: {session.focusLosses} lần. Chỉ là dấu hiệu
-              tham khảo, không phải kết luận gian lận.
-            </p>
             <div className="actions">
               <button className="button" disabled={busy} onClick={start}>
-                Chơi lại →
+                Ôn lại →
               </button>
               <button
                 className="outline-button"
@@ -509,11 +428,12 @@ export default function Quiz() {
               <p>Bạn đã trả lời đúng tất cả câu hỏi!</p>
             )}
             {result.review
-              .filter((q) => !reviewWrong || !q.correct)
-              .map((q) => (
+              .map((q, index) => ({ q, number: index + 1 }))
+              .filter(({ q }) => !reviewWrong || !q.correct)
+              .map(({ q, number }) => (
                 <article className="review-card" key={q.id}>
                   <p className="eyebrow">
-                    CÂU {result.review.indexOf(q) + 1} ·{" "}
+                    CÂU {number} ·{" "}
                     {q.correct
                       ? "CHÍNH XÁC"
                       : q.selectedOptionId
@@ -531,44 +451,29 @@ export default function Quiz() {
                     {q.options.find((o) => o.id === q.correctOptionId)?.text}
                   </p>
                   <p>{q.explanation}</p>
-                  <a href={q.source.url} target="_blank" rel="noreferrer">
-                    {q.source.title} ↗
-                  </a>
+                  {q.source && (
+                    <a href={q.source.url} target="_blank" rel="noreferrer">
+                      {q.source.title} ↗
+                    </a>
+                  )}
                 </article>
               ))}
           </div>
         ) : current ? (
           <div className="quiz-playing">
+            <div className="quiz-session-header">
             <div className="quiz-toolbar">
-              <span>
-                {session.name} /{" "}
-                {session.mode === "practice" ? "Tự luyện" : "Thử thách"}
-              </span>
-              {remaining !== null ? (
-                <strong
-                  className={remaining <= 30 ? "time-warning" : ""}
-                  role="timer"
-                  aria-label="Thời gian còn lại"
-                >
-                  ◷ {timeText(remaining)}
-                </strong>
-              ) : (
-                <span>Không giới hạn thời gian</span>
-              )}
+              <span>Ôn tập theo tốc độ của bạn</span>
               <button
                 type="button"
                 className="text-link"
                 disabled={busy || moved}
                 onClick={() => {
-                  if (
-                    window.confirm(
-                      "Nộp bài và xem kết quả? Các câu chưa trả lời sẽ không được tính điểm.",
-                    )
-                  )
+                  if (window.confirm("Kết thúc buổi ôn tập và xem lời giải?"))
                     run("finish");
                 }}
               >
-                Nộp bài
+                Kết thúc ôn tập
               </button>
             </div>
             <div className="progress-copy">
@@ -585,10 +490,9 @@ export default function Quiz() {
             <p className="quiz-save-state" role="status">
               {busy
                 ? "Đang đồng bộ với máy chủ…"
-                : remaining === 0
-                  ? "Đã hết thời gian hiển thị. Đang chờ máy chủ xác nhận kết quả…"
-                  : "Bài làm được lưu khi máy chủ xác nhận. Có thể tải lại để tiếp tục."}
+                : "Tiến độ đã xác nhận được lưu để bạn có thể tiếp tục sau."}
             </p>
+            </div>
             <article className="question-card">
               <p className="eyebrow">
                 {catalog?.topics.find((t) => t.id === current.topic)?.title}
@@ -598,7 +502,7 @@ export default function Quiz() {
               </h1>
               <fieldset
                 className="answer-options"
-                disabled={confirmed || busy || moved || remaining === 0}
+                disabled={confirmed || busy || moved}
               >
                 <legend className="sr-only">Chọn một đáp án</legend>
                 {current.options.map((option, i) => (
@@ -614,14 +518,13 @@ export default function Quiz() {
                     />
                     <span className="answer-letter">{letters[i]}</span>
                     <span>{option.text}</span>
-                    {feedback?.correctOptionId === option.id && (
-                      <strong>✓</strong>
-                    )}
+                    {feedback?.correctOptionId === option.id && <strong>✓ Đúng</strong>}
+                    {feedback && choice === option.id && !feedback.correct && <strong>✕ Sai</strong>}
                   </label>
                 ))}
               </fieldset>
               {feedback && (
-                <div className="answer-explanation" role="status">
+                <div className={`answer-explanation ${feedback.correct ? "is-correct" : ""}`} role="status">
                   <strong>
                     {feedback.correct ? "Chính xác!" : "Cùng ghi nhớ lại."}
                   </strong>
@@ -634,20 +537,16 @@ export default function Quiz() {
                     }
                     . {feedback.explanation}
                   </p>
-                  <a
-                    href={feedback.source.url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {feedback.source.title} ↗
-                  </a>
+                  {feedback.source && (
+                    <a href={feedback.source.url} target="_blank" rel="noreferrer">
+                      {feedback.source.title} ↗
+                    </a>
+                  )}
                 </div>
               )}
               <div className="question-actions">
                 <span>
-                  {session.mode === "practice"
-                    ? "Xác nhận đáp án để xem lời giải; không thể sửa sau khi đã gửi."
-                    : "Máy chủ chỉ trả đáp án và lời giải khi kết thúc bài."}
+                  {confirmed ? "Đã lưu đáp án." : "Chọn một phương án rồi xác nhận."}
                 </span>
                 {confirmed ? (
                   <button
@@ -663,7 +562,7 @@ export default function Quiz() {
                 ) : (
                   <button
                     className="button"
-                    disabled={!choice || busy || moved || remaining === 0}
+                    disabled={!choice || busy || moved}
                     onClick={() =>
                       run("answer", {
                         questionId: current.id,

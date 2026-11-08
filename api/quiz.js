@@ -1,4 +1,6 @@
-import { questions, topics } from "../server/questionBank.js";
+import { topics } from "../src/data/quiz.js";
+import { createFirebaseQuestionBank } from "../server/firebaseQuestionBank.js";
+import { createQuizBank } from "../server/quizBank.js";
 import { createQuizService } from "../server/quizService.js";
 import { createRedisStore } from "../server/quizStore.js";
 import { createQuizHandler } from "../server/quizHttp.js";
@@ -11,10 +13,14 @@ export default async function quiz(req, res) {
         url: process.env.UPSTASH_REDIS_REST_URL,
         token: process.env.UPSTASH_REDIS_REST_TOKEN,
       });
+      const questionBank = createQuizBank(createFirebaseQuestionBank(process.env), topics);
       handler = createQuizHandler({
-        service: createQuizService({ store, bank: questions, topics }),
+        service: createQuizService({ store, questionBank, topics }),
         store,
+        questionBank,
         secret: process.env.QUIZ_SESSION_SECRET,
+        importSecret: process.env.QUIZ_IMPORT_SECRET,
+        studyEnabled: process.env.QUIZ_STUDY_ENABLED !== "false",
       });
     }
     return await handler(req, res);

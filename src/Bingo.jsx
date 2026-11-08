@@ -17,7 +17,7 @@ export default function Bingo() {
             <em>Chạm mốc Bingo.</em>
           </h1>
           <p className="page-intro">
-            Ôn tập Chủ đề 5 qua các sự kiện, văn kiện và khái niệm lịch sử Đảng.
+            Ôn tập giai đoạn 1975–1986 qua các sự kiện, văn kiện và khái niệm lịch sử Đảng.
           </p>
           <ol className="bingo-guide">
             <li>

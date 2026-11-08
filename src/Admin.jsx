@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { onValue, push, ref, runTransaction, set, update } from 'firebase/database';
 import { db } from './firebase';
 import Chat from './Chat';
+import QuizBankAdmin from './QuizBankAdmin';
 import './Admin.css';
 
 const ADMIN_SESSION_KEY = 'vnr202.admin.unlocked';
@@ -545,6 +546,8 @@ export default function Admin() {
             </div>
           </aside>
         </div>
+
+        <QuizBankAdmin />
 
         <footer className="admin-footer">
           <span>Dấu ấn lịch sử Đảng</span>

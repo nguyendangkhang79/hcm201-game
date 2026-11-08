@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import LocationPhotoCredit from "./LocationPhotoCredit";
 
-export default function LocationCard({ site, index }) {
+export default function LocationCard({ site, index, compact = false }) {
   const [failed, setFailed] = useState(false);
   return (
     <article className="location-card">
@@ -9,15 +10,17 @@ export default function LocationCard({ site, index }) {
         {site.image && !failed ? (
           <img
             src={site.image}
-            alt={site.title}
+            alt={site.credit?.alt ?? site.title}
             loading="lazy"
+            decoding="async"
+            style={{ objectPosition: site.credit?.position }}
             onError={() => setFailed(true)}
           />
         ) : (
           <div className="location-placeholder">
             <span>{site.date}</span>
             <p>{site.title}</p>
-            <small>ĐỊA ĐIỂM & TƯ LIỆU</small>
+            <small>{site.location}</small>
           </div>
         )}
         <span className="location-badge">
@@ -27,7 +30,7 @@ export default function LocationCard({ site, index }) {
               ? "TƯ LIỆU SỐ"
               : "THÔNG TIN ĐỊA ĐIỂM"}
         </span>
-        <span className="location-index">0{index + 1}</span>
+        <span className="location-index">{String(index + 1).padStart(2, "0")}</span>
       </Link>
       <div className="location-body">
         <p className="eyebrow">
@@ -35,7 +38,7 @@ export default function LocationCard({ site, index }) {
         </p>
         <h3>{site.title}</h3>
         <p className="event-name">{site.event}</p>
-        <p>{site.description}</p>
+        {!compact && <p>{site.description}</p>}
         {site.note && <p className="site-note">{site.note}</p>}
         <div className="card-actions">
           <Link className="text-link" to={`/explore?site=${site.id}`}>
@@ -63,19 +66,7 @@ export default function LocationCard({ site, index }) {
           ))}
           {site.credit && (
             <p>
-              Ảnh:{" "}
-              <a href={site.credit.url} target="_blank" rel="noreferrer">
-                {site.credit.author}
-              </a>{" "}
-              ·{" "}
-              <a
-                href={`https://creativecommons.org/licenses/by-sa/${site.credit.version}/`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                CC BY-SA {site.credit.version}
-              </a>
-              . Hiển thị cắt khung; ảnh gốc giữ nguyên.
+              <LocationPhotoCredit credit={site.credit} />
             </p>
           )}
         </details>

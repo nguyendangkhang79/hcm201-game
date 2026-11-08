@@ -1,19 +1,24 @@
 import { sources } from "./sources.js";
+import { tourLocations } from "./tourLocations.js";
+import { locationPhotos } from "./locationPhotos.js";
 
-export const locations = [
+const laterLocations = [
   {
     id: "thong-nhat",
     title: "Dinh Độc Lập · Hội trường Thống Nhất",
     location: "Thành phố Hồ Chí Minh",
-    periods: ["1975–1976"],
     date: "30.04 & 15–21.11.1975",
     event: "Từ thắng lợi mùa Xuân đến Hiệp thương thống nhất",
     image: "/history/palace.jpg",
     description:
       "Dinh Độc Lập là địa điểm gắn với thắng lợi ngày 30/4/1975, kết thúc chiến tranh và mở ra thời kỳ hòa bình, thống nhất. Cũng tại Hội trường Thống Nhất, Hội nghị Hiệp thương chính trị tháng 11/1975 bàn các bước thống nhất đất nước về mặt nhà nước. Hai sự kiện giúp phân biệt thống nhất lãnh thổ với quá trình xây dựng bộ máy nhà nước chung. Khi tìm hiểu, hãy nối mốc tháng 4 với Hiệp thương và cuộc Tổng tuyển cử năm 1976 để thấy sự tiếp nối của hành trình thống nhất.",
-    sources: [sources.palace, sources.consultation],
-    visit: { type: "digital", url: sources.consultation.url },
+    sources: [sources.palace, sources.consultation, {
+      title: "VR360 · Giới thiệu tour Dinh Độc Lập",
+      url: "https://vr360.com.vn/dinh-doc-lap",
+    }],
+    visit: { type: "3d", url: "https://vr360.com.vn/projects/dinhdoclap/" },
     credit: {
+      alt: "Xe tăng trưng bày trước Dinh Độc Lập, ảnh chụp năm 2013",
       author: "Clay Gilliland",
       version: "2.0",
       url: "https://commons.wikimedia.org/wiki/File:Independence_Palace_or_Reunification_Palace_(12110613104).jpg",
@@ -28,15 +33,15 @@ export const locations = [
     id: "ba-dinh",
     title: "Hội trường Ba Đình cũ",
     location: "Khu vực Ba Đình, Hà Nội",
-    periods: ["1975–1976", "1982–1986"],
     date: "1976 · 1982 · 1986",
     event: "Không gian của Quốc hội và các kỳ Đại hội Đảng",
     image: "/history/ba-dinh.jpg",
     description:
-      "Hội trường Ba Đình cũ là không gian hội họp quan trọng của Quốc hội và các kỳ Đại hội Đảng, trong đó có các Đại hội IV, V, VI. Với Chủ đề 5, địa điểm giúp kết nối những quyết định xây dựng đất nước sau thống nhất với bước ngoặt Đổi mới năm 1986. Công trình cũ không còn tồn tại; hình ảnh trên trang là tư liệu về hội trường trước đây, không phải Nhà Quốc hội hiện nay. Trải nghiệm tại đây sử dụng tư liệu lịch sử thay cho một tour tham quan công trình gốc.",
-    sources: [sources.hall, sources.iv, sources.vi],
+      "Hội trường Ba Đình cũ từng là nơi họp của Quốc hội và tổ chức các Đại hội IV, V, VI. Ba kỳ Đại hội tại đây giúp nối các quyết định xây dựng đất nước sau thống nhất với bước ngoặt Đổi mới năm 1986. Ảnh trên trang ghi lại hội trường trước khi công trình được tháo dỡ.",
+    sources: [sources.hall, sources.iv, sources.v, sources.vi],
     visit: { type: "digital", url: sources.hall.url },
     credit: {
+      alt: "Mặt tiền Hội trường Ba Đình cũ trước khi tháo dỡ",
       author: "joxeankoret",
       version: "2.0",
       url: "https://commons.wikimedia.org/wiki/File:Ba_Dinh_Hall_1462359227_71b04ee08a.jpg",
@@ -52,7 +57,6 @@ export const locations = [
     id: "ba-chuc",
     title: "Khu di tích Nhà mồ Ba Chúc",
     location: "Ba Chúc, An Giang",
-    periods: ["1977–1979"],
     date: "THÁNG 04.1978",
     event: "Ký ức về chiến tranh bảo vệ biên giới Tây Nam",
     image: "/history/ba-chuc.jpg",
@@ -61,6 +65,7 @@ export const locations = [
     sources: [sources.bachuc],
     visit: { type: "digital", url: sources.bachuc.url },
     credit: {
+      alt: "Công trình tưởng niệm tại khu di tích Nhà mồ Ba Chúc",
       author: "Bùi Thụy Đào Nguyên",
       version: "4.0",
       url: "https://commons.wikimedia.org/wiki/File:Nhà_mồ_Ba_Chúc.jpg",
@@ -75,12 +80,10 @@ export const locations = [
     id: "po-hen",
     title: "Khu di tích lịch sử Pò Hèn",
     location: "Quảng Ninh",
-    periods: ["1977–1979"],
     date: "17.02.1979",
     event: "Cuộc chiến đấu bảo vệ biên giới phía Bắc",
-    image: null,
     description:
-      "Pò Hèn gắn với cuộc chiến đấu ngày 17/2/1979 của cán bộ, chiến sĩ biên phòng và nhân dân tại Quảng Ninh. Di tích là điểm tìm hiểu nhiệm vụ bảo vệ chủ quyền biên giới phía Bắc trong giai đoạn sau thống nhất. Đọc câu chuyện Pò Hèn bên cạnh tư liệu về biên giới Tây Nam giúp nhận diện những khó khăn quốc phòng của đất nước cuối thập niên 1970. Trang giới thiệu thông tin và nguồn kiểm chứng; hình ảnh hay tour tương tác chỉ được bổ sung khi có tư liệu phù hợp và quyền sử dụng rõ ràng.",
+      "Pò Hèn gắn với cuộc chiến đấu ngày 17/2/1979 của cán bộ, chiến sĩ biên phòng và nhân dân tại Quảng Ninh. Di tích là điểm tìm hiểu nhiệm vụ bảo vệ chủ quyền biên giới phía Bắc trong giai đoạn sau thống nhất. Đọc câu chuyện Pò Hèn bên cạnh tư liệu về biên giới Tây Nam giúp nhận diện những khó khăn quốc phòng của đất nước cuối thập niên 1970.",
     sources: [sources.pohen],
     visit: { type: "info", url: null },
     milestones: [["17/2/1979", "Chiến đấu bảo vệ biên giới tại Pò Hèn."]],
@@ -88,35 +91,10 @@ export const locations = [
   },
 ];
 
-export const timeline = [
-  {
-    year: "1975",
-    title: "Đất nước liền một dải",
-    text: "Thắng lợi 30/4; Hiệp thương chính trị tháng 11.",
-    source: sources.consultation,
-  },
-  {
-    year: "1976",
-    title: "Một Nhà nước thống nhất",
-    text: "Tổng tuyển cử cả nước; Đại hội IV của Đảng.",
-    source: sources.reunification,
-  },
-  {
-    year: "1979",
-    title: "Bảo vệ biên cương",
-    text: "Bảo vệ Tổ quốc; những tìm tòi trong kinh tế.",
-    source: sources.khoan,
-  },
-  {
-    year: "1981",
-    title: "Khơi thông sản xuất",
-    text: "Chỉ thị 100 mở rộng khoán trong nông nghiệp.",
-    source: sources.khoan,
-  },
-  {
-    year: "1986",
-    title: "Bước ngoặt Đổi mới",
-    text: "Đại hội VI đề ra đường lối đổi mới toàn diện.",
-    source: sources.vi,
-  },
-];
+export const locations = [
+  ...tourLocations,
+  ...laterLocations.map((site) => ({ ...site, chapter: "reunification" })),
+].map((site) => {
+  const credit = locationPhotos[site.id];
+  return credit ? { ...site, credit, image: `/history/${site.id}.webp` } : site;
+});

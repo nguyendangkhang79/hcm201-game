@@ -2,18 +2,30 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { createServer } from "node:http";
-import { questions, topics } from "../server/questionBank.js";
+import { questions, topics } from "./fixtures/quizQuestions.js";
 import { createQuizService } from "../server/quizService.js";
 import { createMemoryStore, createRedisStore } from "../server/quizStore.js";
 import { createQuizHandler } from "../server/quizHttp.js";
+import { createQuizBank } from "../server/quizBank.js";
 import { estimateServerNow, secondsRemaining } from "../src/quizClient.js";
 
-function setup() {
+function setup(seed = questions) {
   let now = 100000;
   const store = createMemoryStore();
+  let rows = Object.fromEntries(seed.map(({ id, ...question }) => [
+    id, { ...question, enabled: true, revision: 0 },
+  ]));
+  const questionBank = createQuizBank({
+    async read() { return structuredClone(rows); },
+    async transact(change) {
+      const next = change(rows);
+      if (next.questions) rows = next.questions;
+      return next.result;
+    },
+  }, topics);
   const service = createQuizService({
     store,
-    bank: questions,
+    questionBank,
     topics,
     clock: () => now,
   });
@@ -30,6 +42,7 @@ function setup() {
   });
   return {
     store,
+    questionBank,
     service,
     actor,
     clientId,
@@ -81,6 +94,44 @@ test("challenge sends only current question and opaque options, no answer keys u
   assert.equal(done.result.correct, 1);
   assert.equal(done.result.points, 100);
   assert.equal(done.result.skipped, 9);
+});
+
+test("practice can include all 160 questions in a topic", async () => {
+  const seed = questions.find(({ topic }) => topic === "unity");
+  const s = setup(Array.from({ length: 160 }, () => ({ ...seed, id: randomUUID() })));
+  await assert.rejects(s.start({ mode: "practice", count: 161 }), {
+    code: "NOT_ENOUGH_QUESTIONS",
+  });
+  await assert.rejects(s.start({ mode: "challenge", count: 20 }), {
+    code: "INVALID_SETTINGS",
+  });
+  assert.equal((await s.start({ mode: "practice", count: 160 })).total, 160);
+});
+
+test("study library orders enabled questions by source code and hides bank fields", async () => {
+  const seed = questions.find(({ topic }) => topic === "unity");
+  const s = setup([2, 3, 1].map((number) => ({
+    ...seed, id: randomUUID(), study: { code: `C1-00${number}`, group: "Nhóm ôn tập" },
+  })));
+  const hidden = (await s.questionBank.list()).find(({ study }) => study.code === "C1-003");
+  await s.questionBank.changeQuestion("bank-toggle", { id: hidden.id, revision: 0, enabled: false });
+  const { questions: deck } = await s.service.study("unity");
+  assert.deepEqual(deck.map(({ code }) => code), ["C1-001", "C1-002"]);
+  assert.equal(deck[0].correctAnswer, seed.correctAnswer);
+  assert.equal(deck[0].group, "Nhóm ôn tập");
+  assert.equal(deck[0].revision, undefined);
+  await assert.rejects(s.service.study("invalid"), { code: "INVALID_TOPICS" });
+});
+
+test("empty bank stays empty until an administrator adds questions", async () => {
+  const s = setup([]);
+  assert.equal((await s.service.catalog()).total, 0);
+  await assert.rejects(s.start({ count: 1 }), (error) => error.code === "NOT_ENOUGH_QUESTIONS");
+  await s.questionBank.importQuestions([{
+    topic: "unity", question: "Câu hỏi do quản trị viên thêm",
+    options: ["Một", "Hai", "Ba", "Bốn"], answer: "B", explanation: "Lời giải.",
+  }]);
+  assert.equal((await s.start({ mode: "practice", count: 1 })).total, 1);
 });
 
 test("expired session cannot accept answers; resume after sleep/reload returns immutable timeout result", async () => {
@@ -256,10 +307,13 @@ test("Redis requests use atomic Lua compare-and-set with TTL preservation; stora
 
 test("HTTP requires same origin, validates JSON, signs HttpOnly cookies and enforces rate limits", async (t) => {
   const s = setup();
+  const importSecret = "test-import-key-with-more-than-32-characters";
   const handler = createQuizHandler({
     service: s.service,
     store: s.store,
+    questionBank: s.questionBank,
     secret: "test-secret-with-more-than-32-characters",
+    importSecret,
     development: true,
   });
   const server = createServer(handler);
@@ -293,19 +347,115 @@ test("HTTP requires same origin, validates JSON, signs HttpOnly cookies and enfo
     body: "{",
   });
   assert.equal(broken.status, 400);
-  const post = (input) =>
+  const post = (input, key) =>
     fetch(url, {
       method: "POST",
       headers: {
         Origin: url,
         "Content-Type": "application/json",
         Cookie: cookie.split(";")[0],
+        ...(key ? { Authorization: `Bearer ${key}` } : {}),
       },
       body: JSON.stringify(input),
     });
-  const created = await post({ action: "start", ...s.input() });
+  const legacyInput = s.input();
+  assert.equal((await post({ action: "start", ...legacyInput })).status, 400);
+  const actor = cookie.split("=")[1].split(".")[0];
+  const legacy = await s.service.start(actor, legacyInput);
+  const optionId = legacy.question.options[0].id;
+  await s.service.act(actor, "answer", {
+    attemptId: legacy.id,
+    clientId: s.clientId,
+    questionId: legacy.question.id,
+    optionId,
+  });
+  const resumed = (await (await post({ action: "active", clientId: s.clientId })).json()).state;
+  assert.equal(resumed.id, legacy.id);
+  assert.equal(resumed.mode, "practice");
+  assert.equal(resumed.deadline, null);
+  assert.equal(resumed.answered, 1);
+  assert.equal((await post({ action: "focus", attemptId: resumed.id, clientId: s.clientId })).status, 400);
+  await post({ action: "finish", attemptId: resumed.id, clientId: s.clientId });
+
+  const created = await post({ action: "start", ...s.input({ mode: "practice" }) });
   assert.equal(created.status, 200);
   const state = (await created.json()).state;
+  assert.equal(state.deadline, null);
+  const answered = await post({
+    action: "answer",
+    attemptId: state.id,
+    clientId: s.clientId,
+    questionId: state.question.id,
+    optionId: state.question.options[0].id,
+  });
+  assert.ok((await answered.json()).state.feedback.explanation);
+  const imported = Array.from({ length: 5 }, (_, index) => ({
+    topic: "unity",
+    question: `Câu hỏi nhập thử số ${index + 1}`,
+    options: ["Một", "Hai", "Ba", "Bốn"],
+    answer: "B",
+    explanation: "Đây là lời giải dùng để kiểm thử.",
+  }));
+  const upload = { action: "import", questions: imported };
+  assert.equal((await post(upload, "wrong-key")).status, 403);
+  const invalid = await post(
+    { ...upload, questions: [...imported, { ...imported[0], answer: "E" }] },
+    importSecret,
+  );
+  assert.equal(invalid.status, 400);
+  assert.match((await invalid.json()).error.message, /Câu 6/);
+  assert.equal((await (await fetch(url)).json()).total, 60);
+  const uploads = await Promise.all([
+    post(upload, importSecret),
+    post(upload, importSecret),
+  ]);
+  const results = await Promise.all(uploads.map((response) => response.json()));
+  assert.deepEqual(results.sort((a, b) => b.added - a.added), [
+    { added: 5, skipped: 0 },
+    { added: 0, skipped: 5 },
+  ]);
+  const updatedCatalog = await (await fetch(url)).json();
+  assert.equal(updatedCatalog.total, 65);
+  assert.equal(updatedCatalog.topics.find(({ id }) => id === "unity").count, 15);
+  assert.equal(updatedCatalog.questions, undefined);
+  assert.equal((await s.store.get(state.id)).round.length, 10);
+  const newState = await s.service.start(randomUUID(), s.input({ count: 15 }));
+  assert.equal(newState.total, 15);
+  const finished = await s.service.act(
+    (await s.store.get(newState.id)).actor,
+    "finish",
+    { attemptId: newState.id, clientId: s.clientId },
+  );
+  const importedReview = finished.result.review.filter(({ source }) => source === null);
+  assert.equal(importedReview.length, 5);
+  assert.ok(importedReview.every(({ options, correctOptionId }) =>
+    options.find(({ id }) => id === correctOptionId).text === "Hai",
+  ));
+  assert.equal((await post({ action: "bank-list" })).status, 403);
+  const { questions: managed } = await (await post({ action: "bank-list" }, importSecret)).json();
+  const item = managed.find(({ question }) => question === imported[0].question);
+  assert.equal(item.correctAnswer, 1);
+  const target = { id: item.id, revision: item.revision };
+  assert.equal((await post({ action: "bank-toggle", ...target, enabled: false }, importSecret)).status, 200);
+  assert.equal((await s.service.catalog()).total, 64);
+  assert.equal((await post({ action: "bank-delete", ...target }, importSecret)).status, 409);
+  const edited = await post({
+    action: "bank-edit", ...target, revision: target.revision + 1,
+    question: { ...imported[0], question: "Nội dung đã chỉnh sửa", answer: "C" },
+  }, importSecret);
+  assert.equal(edited.status, 200);
+  const updated = (await s.questionBank.list()).find(({ id }) => id === item.id);
+  assert.equal(updated.correctAnswer, 2);
+  assert.equal(updated.enabled, false);
+  assert.equal((await post({
+    action: "bank-toggle", id: item.id, revision: updated.revision, enabled: true,
+  }, importSecret)).status, 200);
+  assert.equal((await s.service.catalog()).total, 65);
+  assert.equal((await post({
+    action: "bank-delete", id: item.id, revision: updated.revision + 1,
+  }, importSecret)).status, 200);
+  assert.equal((await s.service.catalog()).total, 64);
+  assert.ok(finished.result.review.some(({ question }) => question === item.question));
   const forged = await fetch(url, {
     method: "POST",
     headers: {

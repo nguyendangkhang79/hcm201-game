@@ -2,27 +2,29 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import Layout from "./Layout";
 import LocationCard from "./LocationCard";
+import LocationPhotoCredit from "./LocationPhotoCredit";
 import { locations } from "./data/history";
+import { chapters } from "./data/tourLocations";
 
 export default function Explore() {
   const [params] = useSearchParams();
-  const [period, setPeriod] = useState("all");
+  const [chapter, setChapter] = useState("all");
   const selected = locations.find((site) => site.id === params.get("site"));
   const visible = locations.filter(
-    (site) => period === "all" || site.periods.includes(period),
+    (site) => chapter === "all" || site.chapter === chapter,
   );
   return (
     <Layout>
       <section className="page-width section-space">
-        <p className="eyebrow">KHÔNG GIAN LỊCH SỬ / CHỦ ĐỀ 05</p>
+        <p className="eyebrow">VNR202 / HÀNH TRÌNH DI TÍCH</p>
         <h1 className="page-title">
           Theo địa điểm.
           <br />
           <em>Hiểu sự kiện.</em>
         </h1>
         <p className="page-intro">
-          Từ thống nhất đất nước đến bảo vệ biên cương và Đổi mới. Mỗi điểm đến
-          là một lát cắt để kết nối kiến thức.
+          Từ Bến Nhà Rồng đến các căn cứ kháng chiến và Dinh Độc Lập. Chọn một
+          chặng lịch sử hoặc mở tour 3D để khám phá từng điểm dừng.
         </p>
         {selected ? (
           <article className="event-detail">
@@ -33,12 +35,33 @@ export default function Explore() {
               {selected.location} · {selected.date}
             </p>
             <h2>{selected.title}</h2>
+            {selected.image && (
+              <figure className="event-photo">
+                <img
+                  src={selected.image}
+                  alt={selected.credit?.alt ?? selected.title}
+                  decoding="async"
+                  style={{ objectPosition: selected.credit?.position }}
+                />
+                {selected.credit && (
+                  <figcaption>
+                    <LocationPhotoCredit credit={selected.credit} />
+                  </figcaption>
+                )}
+              </figure>
+            )}
             <p>{selected.description}</p>
             {selected.note && <p className="site-note">{selected.note}</p>}
+            {selected.visit.type === "3d" && (
+              <a className="button" href={selected.visit.url} target="_blank" rel="noreferrer">
+                Mở tour 3D / 360° ↗
+              </a>
+            )}
+            {selected.tourStops && <h3>Điểm dừng nên xem trong tour</h3>}
             <ol>
-              {selected.milestones.map(([date, text]) => (
-                <li key={date}>
-                  <strong>{date}</strong>
+              {(selected.tourStops ?? selected.milestones).map(([label, text]) => (
+                <li key={label}>
+                  <strong>{label}</strong>
                   <span>{text}</span>
                 </li>
               ))}
@@ -65,24 +88,30 @@ export default function Explore() {
             <div
               className="filter-bar"
               role="group"
-              aria-label="Lọc theo giai đoạn"
+              aria-label="Lọc theo chặng lịch sử"
             >
-              {["all", "1975–1976", "1977–1979", "1982–1986"].map((value) => (
+              {[{ id: "all", title: "Tất cả địa điểm" }, ...chapters].map(({ id, title }) => (
                 <button
-                  key={value}
-                  aria-pressed={period === value}
-                  onClick={() => setPeriod(value)}
+                  key={id}
+                  aria-pressed={chapter === id}
+                  onClick={() => setChapter(id)}
                 >
-                  {value === "all" ? "Tất cả địa điểm" : value}
+                  {title}
                 </button>
               ))}
-              <span>{visible.length} địa điểm</span>
+              <span role="status">{visible.length} địa điểm</span>
             </div>
-            <div className="location-grid">
-              {visible.map((site, index) => (
-                <LocationCard key={site.id} site={site} index={index} />
-              ))}
-            </div>
+            {chapters.filter(({ id }) => chapter === "all" || chapter === id).map(({ id, title, range }) => (
+              <section className="visit-chapter" key={id} aria-labelledby={id}>
+                <p className="eyebrow">{range}</p>
+                <h2 id={id}>{title}</h2>
+                <div className="location-grid">
+                  {visible.filter((site) => site.chapter === id).map((site) => (
+                    <LocationCard key={site.id} site={site} index={locations.indexOf(site)} />
+                  ))}
+                </div>
+              </section>
+            ))}
           </>
         )}
       </section>

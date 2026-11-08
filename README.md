@@ -22,23 +22,23 @@ Vite in địa chỉ xem trước trong terminal. Build nằm ở `dist/`. Giữ
 | `/` | Giới thiệu, timeline, địa điểm, lối vào Quiz/Bingo |
 | `/explore` | Lọc giai đoạn, xem sự kiện và nguồn |
 | `/explore?site=ba-dinh` | Chi tiết một địa điểm |
-| `/quiz` | Tự luyện và thử thách, chấm điểm, xem lời giải |
+| `/quiz` | Ôn tập theo chủ đề, xem đáp án và lời giải |
 | `/bingo` | Nhập tên và hướng dẫn Bingo |
 | `/play` | Xếp bảng và tham gia Bingo cùng lớp |
-| `/admin` | Điều khiển Bingo theo cơ chế PIN cũ |
+| `/admin` | Điều khiển Bingo và quản lý ngân hàng câu hỏi Quiz |
 | `/live` | Người tham gia và kết quả trực tiếp |
 
 ## Dữ liệu cần biên tập
 
-- `server/questionBank.js`: 60 câu hỏi, sáu nhóm (10 câu/nhóm); đáp án và lời giải chỉ dùng ở máy chủ.
+- Firebase Realtime Database `/quizBank`: câu hỏi, phương án, đáp án và lời giải do quản trị viên quản lý.
 - `src/data/quiz.js`: chỉ chứa tên/mô tả chủ đề công khai.
 - `src/data/history.js`: địa điểm, sự kiện, timeline, trạng thái tham quan và bản quyền ảnh.
 - `src/data/sources.js`: nguồn tham khảo chính thống dùng chung.
 - `src/data/bingo.js`: 36 từ khóa VNR202.
 
-Mỗi lượt Quiz chọn ngẫu nhiên 10 hoặc 15 câu và đảo cả phương án. Chọn 15 câu cần kết hợp ít nhất hai chủ đề. Thử thách có tổng thời gian bằng số câu × 45 giây; 100 điểm/câu đúng, không thưởng tốc độ. API máy chủ phát từng câu, khóa đáp án, áp dụng deadline và chấm điểm. Bài làm được khôi phục khi tải lại; kết quả có lời giải, nguồn và tải CSV.
+Mỗi lượt Quiz lấy ngẫu nhiên 10, 20, 30 hoặc 50 câu trong các chủ đề đã chọn và đảo cả phương án. Bạn cũng có thể chọn ôn toàn bộ số câu thuộc các chủ đề đã chọn. Sau khi xác nhận từng câu, bạn có thể đọc lời giải ngay. Bài ôn tập không giới hạn thời gian và có thể tiếp tục sau khi tải lại.
 
-**Quiz trên Vercel cần cấu hình backend:** thiết lập `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `QUIZ_SESSION_SECRET` theo [docs/QUIZ_SECURITY.md](docs/QUIZ_SECURITY.md). Không dùng tiền tố `VITE_`. Nếu chưa cấu hình, API trả lỗi rõ ràng và không chuyển sang chấm điểm ở client. `npm run dev` có API local dùng bộ nhớ tạm; khởi động lại dev server có thể mất bài. `npm run preview` chỉ phục vụ file static, không chạy API.
+Ngân hàng bắt đầu trống. Để thêm, nhập JSON, sửa, ẩn hoặc xóa câu hỏi, cấu hình Firebase và mở mục **Ngân hàng câu hỏi ôn tập** tại `/admin`. Xem các biến môi trường và cách triển khai rules trong [docs/QUIZ_SECURITY.md](docs/QUIZ_SECURITY.md).
 
 Bingo chuyển sang `courses/vnr202/gameState` và `courses/vnr202/chat/messages`. Lần đăng nhập trọng tài đầu tiên khởi tạo kho từ khóa bằng transaction nếu chưa có dữ liệu. Không ghi đè kho đã tồn tại và không di chuyển/xóa phòng cũ.
 
@@ -48,6 +48,6 @@ Xóa kho lưu `wordList: false` để phân biệt kho đã được xóa với 
 
 Đây là bản triển khai cục bộ, chưa đổi tên miền hoặc triển khai Vercel. Dữ liệu lịch sử đã kèm nguồn đối chiếu nhưng nhóm/giảng viên cần duyệt theo đúng giáo trình đang học. Có bốn địa điểm, chưa đủ sáu; Pò Hèn chưa có ảnh được cấp phép hoặc tour số. Không địa điểm nào được quảng cáo là tour 3D khi chưa xác minh.
 
-Cơ chế PIN phía client và Firebase rules đọc/ghi công khai của **Bingo** là thiết kế có sẵn, chưa phải phân quyền an toàn. Quiz mới sử dụng kho Redis riêng phía máy chủ; không lưu đáp án hay điểm vào Firebase công khai. Cơ chế Quiz không xác minh danh tính thật, không thể ngăn dùng điện thoại/người hỗ trợ để tra cứu.
+Cơ chế PIN phía client và Firebase rules đọc/ghi công khai của **Bingo** là thiết kế có sẵn, chưa phải phân quyền an toàn. Quiz lưu câu hỏi ở nhánh Firebase riêng do máy chủ truy cập và lưu phiên ôn tập trong Redis.
 
 Xem phân tích, quyết định và ma trận nghiệm thu tại [docs/VNR202_REVAMP.md](docs/VNR202_REVAMP.md).
